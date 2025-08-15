@@ -184,10 +184,10 @@
                 <button class="accordion-header" onclick="toggleAccordion(this)">1. Strojenie Min. PWM</button>
                 <div class="accordion-content">
                      <p style="margin-top:0; margin-bottom:15px; text-align:left;">Podnies robota w powietrze! Ustaw PWM i kliknij 'Testuj', aby znalezc prog startowy silnika.</p>
-                     <div class="manual-tune-row" data-motor="left" data-direction="fwd"><label>Lewy (Przod)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="1023" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
-                     <div class="manual-tune-row" data-motor="left" data-direction="bwd"><label>Lewy (Tyl)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="1023" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
-                     <div class="manual-tune-row" data-motor="right" data-direction="fwd"><label>Prawy (Przod)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="1023" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
-                     <div class="manual-tune-row" data-motor="right" data-direction="bwd"><label>Prawy (Tyl)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="1023" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
+                     <div class="manual-tune-row" data-motor="left" data-direction="fwd"><label>Lewy (Przod)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="2047" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
+                     <div class="manual-tune-row" data-motor="left" data-direction="bwd"><label>Lewy (Tyl)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="2047" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
+                     <div class="manual-tune-row" data-motor="right" data-direction="fwd"><label>Prawy (Przod)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="2047" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
+                     <div class="manual-tune-row" data-motor="right" data-direction="bwd"><label>Prawy (Tyl)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="2047" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
                      <hr style="border-color: #4a4f58; margin: 15px 0;">
                      <div class="manual-tune-readout"><div>Enkoder L: <span id="manualEncoderL">0</span></div><div>Enkoder P: <span id="manualEncoderR">0</span></div></div>
                      <button id="manualTuneStopAll" style="width:100%; margin-top:15px; background-color:#ff6347;">ZATRZYMAJ WSZYSTKO</button>
@@ -195,10 +195,10 @@
 
                 <button class="accordion-header" onclick="toggleAccordion(this)">2. Ustawienia Min. PWM</button>
                 <div class="accordion-content">
-                    <div class="setting-block"><div class="setting-container"><label for="minPwmLeftFwdInput">Min. PWM L (Przod)</label><div class="numeric-input-wrapper"><button id="minPwmLeftFwdMinus">-</button><input type="number" id="minPwmLeftFwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmLeftFwdPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="minPwmLeftBwdInput">Min. PWM L (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmLeftBwdMinus">-</button><input type="number" id="minPwmLeftBwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmLeftBwdPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="minPwmRightFwdInput">Min. PWM P (Przod)</label><div class="numeric-input-wrapper"><button id="minPwmRightFwdMinus">-</button><input type="number" id="minPwmRightFwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmRightFwdPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="minPwmRightBwdInput">Min. PWM P (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmRightBwdMinus">-</button><input type="number" id="minPwmRightBwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmRightBwdPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="minPwmLeftFwdInput">Min. PWM L (Przod)</label><div class="numeric-input-wrapper"><button id="minPwmLeftFwdMinus">-</button><input type="number" id="minPwmLeftFwdInput" min="0" max="2047" step="10" value="1240"><button id="minPwmLeftFwdPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="minPwmLeftBwdInput">Min. PWM L (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmLeftBwdMinus">-</button><input type="number" id="minPwmLeftBwdInput" min="0" max="2047" step="10" value="1240"><button id="minPwmLeftBwdPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="minPwmRightFwdInput">Min. PWM P (Przod)</label><div class="numeric-input-wrapper"><button id="minPwmRightFwdMinus">-</button><input type="number" id="minPwmRightFwdInput" min="0" max="2047" step="10" value="1240"><button id="minPwmRightFwdPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="minPwmRightBwdInput">Min. PWM P (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmRightBwdMinus">-</button><input type="number" id="minPwmRightBwdInput" min="0" max="2047" step="10" value="1240"><button id="minPwmRightBwdPlus">+</button></div></div></div>
                 </div>
                 
                 <button class="accordion-header active" onclick="toggleAccordion(this)">3. Strojenie PID (Balans)</button>
@@ -390,14 +390,42 @@
         document.getElementById('emergencyStopBtn').addEventListener('click', () => sendBleMessage({ type: 'emergency_stop' }));
         document.getElementById('resetEncodersBtn').addEventListener('click', () => sendBleMessage({ type: 'reset_encoders' }));
         document.getElementById('calibrateMpuBtn').addEventListener('click', () => sendBleMessage({ type: 'calibrate_mpu' }));
+        
+        // --- POPRAWKA: Dedykowana logika dla ustawień Min PWM ---
+        const minPwmIds = ['minPwmLeftFwd', 'minPwmLeftBwd', 'minPwmRightFwd', 'minPwmRightBwd'];
+        const minPwmKeyMapping = { 'minPwmLeftFwd': 'L_fwd', 'minPwmLeftBwd': 'L_bwd', 'minPwmRightFwd': 'R_fwd', 'minPwmRightBwd': 'R_bwd'};
+        const sendMinPwmUpdate = () => {
+            const payload = {};
+            minPwmIds.forEach(id => {
+                const inputElement = document.getElementById(id + 'Input');
+                if(inputElement) { payload[minPwmKeyMapping[id]] = parseInt(inputElement.value); }
+            });
+            sendBleMessage({ type: 'set_min_pwm_group', params: payload });
+        };
+        minPwmIds.forEach(id => {
+            const input = document.getElementById(id + 'Input'), minusBtn = document.getElementById(id + 'Minus'), plusBtn = document.getElementById(id + 'Plus');
+            if (!input || !minusBtn || !plusBtn) return;
+            const step = parseInt(input.step) || 1;
+            const updateValue = (amount) => {
+                let current = parseInt(input.value);
+                input.value = Math.max(parseInt(input.min), Math.min(parseInt(input.max), current + amount));
+                sendMinPwmUpdate();
+            };
+            minusBtn.addEventListener('click', () => updateValue(-step));
+            plusBtn.addEventListener('click', () => updateValue(step));
+            input.addEventListener('change', sendMinPwmUpdate);
+        });
+
         const setupGroupedInput = (ids, msgType, keyMapping) => { ids.forEach(id => { const input = document.getElementById(id + 'Input'), minusBtn = document.getElementById(id + 'Minus'), plusBtn = document.getElementById(id + 'Plus'); if (!input || !minusBtn || !plusBtn) return; const step = parseFloat(input.step) || 1, isFloat = input.step.includes('.'); const sendGroupUpdate = () => { let msg = { type: msgType }; let payload = {}; ids.forEach(i => { const inputElement = document.getElementById(i + 'Input'); if(inputElement) { let key = keyMapping[i] || i; payload[key] = parseFloat(inputElement.value); } }); if (payload.deadzone !== undefined) payload.deadzone /= 100.0; if (payload.turnFactor !== undefined) payload.turnFactor /= 100.0; if (payload.expo !== undefined) payload.expo /= 100.0; msg.params = payload; sendBleMessage(msg); }; const updateValue = (amount) => { let current = parseFloat(input.value), newValue = current + amount; if (isFloat) { const dp = (step.toString().split('.')[1] || '').length; newValue = parseFloat(newValue.toFixed(dp)); } input.value = Math.max(parseFloat(input.min), Math.min(parseFloat(input.max), newValue)); sendGroupUpdate(); }; minusBtn.addEventListener('click', () => updateValue(-step)); plusBtn.addEventListener('click', () => updateValue(step)); input.addEventListener('change', sendGroupUpdate); }); };
-        setupGroupedInput(['minPwmLeftFwd', 'minPwmLeftBwd', 'minPwmRightFwd', 'minPwmRightBwd'], 'set_min_pwm_group', { 'minPwmLeftFwd': 'L_fwd', 'minPwmLeftBwd': 'L_bwd', 'minPwmRightFwd': 'R_fwd', 'minPwmRightBwd': 'R_bwd'});
+        
+        // Usunięto minPwm z tej funkcji, ma teraz swoją dedykowaną logikę
         setupGroupedInput(['joystickDeadzone', 'turnFactor', 'expoJoystick', 'maxSpeedJoystick'], 'set_joystick_tuning', { 'joystickDeadzone': 'deadzone', 'turnFactor': 'turnFactor', 'expoJoystick': 'expo', 'maxSpeedJoystick': 'maxSpeed' });
         setupGroupedInput(['kpBalance', 'kiBalance', 'kdBalance', 'joystickAngleSensitivity'], 'balance_pid_update', { 'kpBalance': 'kp_b', 'kiBalance': 'ki_b', 'kdBalance': 'kd_b', 'joystickAngleSensitivity': 'angle_sensitivity' });
         setupGroupedInput(['kpSpeed', 'kiSpeed', 'kdSpeed', 'maxTargetAngle', 'speedPidDeadband', 'speedToAngleRatio'], 'speed_pid_update', { 'kpSpeed': 'kp_s', 'kiSpeed': 'ki_s', 'kdSpeed': 'kd_s', 'maxTargetAngle': 'max_target_angle', 'speedPidDeadband': 'deadband_s', 'speedToAngleRatio': 'speed_to_angle_ratio' });
         setupGroupedInput(['kpPosition', 'kiPosition', 'kdPosition', 'maxTargetSpeed', 'positionPidDeadband'], 'position_pid_update', { 'kpPosition': 'kp_p', 'kiPosition': 'ki_p', 'kdPosition': 'kd_p', 'maxTargetSpeed': 'max_target_speed', 'positionPidDeadband': 'deadband_p' });
         setupGroupedInput(['kpRotation', 'kdRotation'], 'rotation_pid_update', { 'kpRotation': 'kp_r', 'kdRotation': 'kd_r' });
         setupGroupedInput(['encoderPPR', 'wheelDiameterCm', 'trackWidthCm', 'motorBacklash'], 'calibration_update', { 'encoderPPR': 'ppr', 'wheelDiameterCm': 'wheel_diameter', 'trackWidthCm': 'track_width', 'motorBacklash': 'backlash'});
+        
         setupManualTuningControls();
         setupDpadControls();
     }
