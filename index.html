@@ -265,7 +265,7 @@
     </div>
 <script>
     // --- ZMIENNE GLOBALNE I KONFIGURACJA ---
-    const PROFILE_PREFIX = 'robot_profile_v13.1_';  // ZMIANA: Nowa wersja profilu
+    const PROFILE_PREFIX = 'robot_profile_v13.1_';
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
         'target_angle': { label: 'Zadany Kat', color: '#a2f279' },
@@ -280,7 +280,7 @@
     let finalTargetAngleForDisplay = 0.0;
     let gamepadIndex, gamepadPollInterval, lastGamepadState = { x: 0, y: 0 };
     let bleDevice, rxCharacteristic, txCharacteristic;
-    let pendingConfigSegments = {};  // NOWE: Do obslugi segmentowanych wiadomosci
+    let pendingConfigSegments = {};
     const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
     const RX_UUID      = "beb5483e-36e1-4688-b7f5-ea07361b26a9";
     const TX_UUID      = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
@@ -331,7 +331,7 @@
         document.getElementById('connectBleBtn').disabled = false;
         rxCharacteristic = null;
         txCharacteristic = null;
-        pendingConfigSegments = {};  // Reset segmentow
+        pendingConfigSegments = {};
     }
 
     function handleBleNotification(event) {
@@ -345,37 +345,34 @@
         const data = JSON.parse(event.data);
         switch (data.type) {
             case 'telemetry': updateUI(data); updateChart(data); break;
-            case 'initial_state': applyInitialState(data); break;
-            case 'system_config': handleConfigSegment(data); break;  // NOWE
-            case 'pid_config': handleConfigSegment(data); break;     // NOWE  
-            case 'motor_config': handleConfigSegment(data); break;   // NOWE
+            case 'initial_state': handleConfigSegment(data); break;
+            case 'system_config': handleConfigSegment(data); break;
+            case 'pid_config': handleConfigSegment(data); break;
+            case 'motor_config': handleConfigSegment(data); break;
             case 'log': addLogMessage(data.message, data.level); break;
             case 'manual_tune_telemetry': updateManualTuneReadout(data); break;
         }
     }
 
-    // NOWE: Obsluga segmentowanych konfiguracji
     function handleConfigSegment(data) {
         const segment = data.segment;
         if (!segment) {
-            applyInitialState(data); // Fallback dla starych wersji
+            applyInitialState(data);
             return;
         }
         
         pendingConfigSegments[segment] = data;
         
-        // Sprawdz czy mamy wszystkie segmenty
         const expectedSegments = ['basic', 'system', 'pid', 'motor'];
         const hasAllSegments = expectedSegments.every(seg => pendingConfigSegments[seg]);
         
         if (hasAllSegments) {
-            // Polacz wszystkie segmenty i zastosuj
             let combinedConfig = {};
             expectedSegments.forEach(seg => {
                 Object.assign(combinedConfig, pendingConfigSegments[seg]);
             });
             applyInitialState(combinedConfig);
-            pendingConfigSegments = {}; // Reset
+            pendingConfigSegments = {};
             addLogMessage('Odebrano pelna konfiguracje (segmentowana)', 'info');
         }
     }
@@ -395,12 +392,10 @@
         document.getElementById('holdPositionSwitch').checked = data.holdPositionEnabled;
         document.getElementById('speedModeSwitch').checked = data.speedModeEnabled;
         
-        // NOWE: Aktualizacja informacji o PWM
         if (data.pwm_max_value) {
             document.getElementById('pwmResolutionVal').textContent = `11-bit (${data.pwm_max_value})`;
         }
         
-        // ZMIANA: Zaktualizowane parametry dla 11-bit PWM
         const params = { 
             expoJoystick: data.expo_joystick, 
             maxSpeedJoystick: data.max_speed_joystick, 
@@ -564,7 +559,7 @@
     function setupManualTuningControls() { 
         document.querySelectorAll('.manual-tune-row').forEach(row => { 
             const input = row.querySelector('.tune-input'); 
-            const step = 10; // ZMIANA: Wiekszy krok dla 11-bit PWM
+            const step = 10;
             
             row.querySelector('.tune-plus').addEventListener('click', () => {
                 input.value = Math.min(parseInt(input.value) + step, 2047);
@@ -744,7 +739,6 @@
         }); 
     }
     
-    // Reszta kodu joysticka i gamepad'a pozostaje bez zmian...
     const joystickCanvas = document.getElementById('joystickCanvas'); 
     const joystickCtx = joystickCanvas.getContext('2d');
     let joystickCenter, joystickRadius, knobRadius, isDragging = false, sendInterval; 
@@ -772,14 +766,19 @@
         joystickCtx.fill(); 
     }
     
+    // === POPRAWKA 1: Prawidlowa obsluga zdarzen dotykowych ===
     function handleMove(e) { 
         if (!isDragging) return; 
         e.preventDefault(); 
         const rect = joystickCanvas.getBoundingClientRect(); 
-        const clientX = e.clientX || e.touches.clientX; 
-        const clientY = e.clientY || e.touches.clientY; 
-        const x = clientX - rect.left - joystickCenter.x, y = clientY - rect.top - joystickCenter.y; 
+        
+        const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+        const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+        
+        const x = clientX - rect.left - joystickCenter.x;
+        const y = clientY - rect.top - joystickCenter.y; 
         const distance = Math.sqrt(x * x + y * y); 
+        
         if (distance > joystickRadius) { 
             const angle = Math.atan2(y, x); 
             currentX = joystickRadius * Math.cos(angle); 
@@ -813,12 +812,16 @@
     document.addEventListener('mouseup', endDrag); 
     document.addEventListener('touchend', endDrag);
     
+    // === POPRAWKA 2: Prawidlowa obsluga gamepada ===
     function pollGamepad() { 
         const gamepads = navigator.getGamepads(); 
         if (!gamepads[gamepadIndex]) return; 
         const gp = gamepads[gamepadIndex]; 
         const deadzone = 0.15; 
-        let joyX = gp.axes, joyY = gp.axes[1]; 
+        
+        let joyX = gp.axes[0] || 0;
+        let joyY = gp.axes[1] || 0;
+        
         const magnitude = Math.sqrt(joyX*joyX + joyY*joyY); 
         if (magnitude < deadzone) { joyX = 0; joyY = 0; } 
         if (joyX !== lastGamepadState.x || joyY !== lastGamepadState.y) { 
