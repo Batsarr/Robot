@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 13.1-BT-STABLE (MOD 10-bit)</title>
+    <title>Robot Samo Balansujacy - Wersja 14.3-PRO</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -84,7 +84,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 13.1-BT-STABLE (MOD 10-bit)</h1>
+    <h1>Robot Samo Balansujacy - Wersja 14.3-PRO</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -96,6 +96,7 @@
             <fieldset style="padding: 10px 10px 5px 10px;"><legend>Strojenie Joysticka</legend>
                 <div class="setting-block" style="margin-bottom: 5px;"><div class="setting-container"><label for="expoJoystickInput">Expo Joysticka (%)</label><div class="numeric-input-wrapper"><button id="expoJoystickMinus">-</button><input type="number" id="expoJoystickInput" min="0" max="90" step="1" value="0"><button id="expoJoystickPlus">+</button></div></div></div>
                 <div class="setting-block"><div class="setting-container"><label for="maxSpeedJoystickInput">Max. predkosc (imp/s)</label><div class="numeric-input-wrapper"><button id="maxSpeedJoystickMinus">-</button><input type="number" id="maxSpeedJoystickInput" min="200" max="4000" step="100" value="1600"><button id="maxSpeedJoystickPlus">+</button></div></div></div>
+                <div class="setting-block"><div class="setting-container"><label for="joystickRampTimeInput">Rampa joysticka (s)</label><div class="numeric-input-wrapper"><button id="joystickRampTimeMinus">-</button><input type="number" id="joystickRampTimeInput" min="0" max="3.0" step="0.1" value="0.5"><button id="joystickRampTimePlus">+</button></div></div></div>
             </fieldset>
             
             <hr style="border-color: #4a4f58; margin: 15px 0;">
@@ -220,6 +221,11 @@
                     <div class="setting-block"><div class="setting-container"><label for="kpBalanceInput">Kp (Sztywnosc)</label><div class="numeric-input-wrapper"><button id="kpBalanceMinus">-</button><input type="number" id="kpBalanceInput" min="0" max="200" step="1" value="35"><button id="kpBalancePlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kiBalanceInput">Ki (Korekta bledu)</label><div class="numeric-input-wrapper"><button id="kiBalanceMinus">-</button><input type="number" id="kiBalanceInput" min="0" max="20" step="0.05" value="0"><button id="kiBalancePlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kdBalanceInput">Kd (Tlumienie)</label><div class="numeric-input-wrapper"><button id="kdBalanceMinus">-</button><input type="number" id="kdBalanceInput" min="0" max="20" step="0.1" value="1.0"><button id="kdBalancePlus">+</button></div></div></div>
+                    <hr style="border-color: #4a4f58; margin: 10px 0;">
+                    <p style="font-weight:bold; color: #61dafb; margin-top: 0;">Ustawienia zaawansowane:</p>
+                    <div class="setting-block"><div class="setting-container"><label for="kpBalanceHighInput">Kp (Duza predkosc)</label><div class="numeric-input-wrapper"><button id="kpBalanceHighMinus">-</button><input type="number" id="kpBalanceHighInput" min="0" max="200" step="1" value="28"><button id="kpBalanceHighPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kdBalanceHighInput">Kd (Duza predkosc)</label><div class="numeric-input-wrapper"><button id="kdBalanceHighMinus">-</button><input type="number" id="kdBalanceHighInput" min="0" max="20" step="0.1" value="1.2"><button id="kdBalanceHighPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="balancePidDerivativeFilterAlphaInput">Filtr pochodnej (Alfa)</label><div class="numeric-input-wrapper"><button id="balancePidDerivativeFilterAlphaMinus">-</button><input type="number" id="balancePidDerivativeFilterAlphaInput" min="0.01" max="1.0" step="0.01" value="0.7"><button id="balancePidDerivativeFilterAlphaPlus">+</button></div></div></div>
                 </div>
                 
                 <button class="accordion-header" onclick="toggleAccordion(this)">4. Strojenie PID (Predkosc)</button>
@@ -265,7 +271,7 @@
     </div>
 <script>
     // --- ZMIENNE GLOBALNE I KONFIGURACJA ---
-    const PROFILE_PREFIX = 'robot_profile_v13.1_10bit_'; // ZMIANA: Nowy prefix dla profili 10-bit
+    const PROFILE_PREFIX = 'robot_profile_v14.3_pro_';
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
         'target_angle': { label: 'Zadany Kat', color: '#a2f279' },
@@ -398,7 +404,8 @@
         
         const params = { 
             expoJoystick: data.expo_joystick, 
-            maxSpeedJoystick: data.max_speed_joystick, 
+            maxSpeedJoystick: data.max_speed_joystick,
+            joystickRampTime: data.joystick_ramp_time,
             minPwmLeftFwd: data.min_pwm_left_fwd, 
             minPwmLeftBwd: data.min_pwm_left_bwd, 
             minPwmRightFwd: data.min_pwm_right_fwd, 
@@ -407,7 +414,10 @@
             turnFactor: data.turn_factor, 
             kpBalance: data.kp_b, 
             kiBalance: data.ki_b, 
-            kdBalance: data.kd_b, 
+            kdBalance: data.kd_b,
+            kpBalanceHigh: data.kp_b_high,
+            kdBalanceHigh: data.kd_b_high,
+            balancePidDerivativeFilterAlpha: data.filter_alpha,
             kpSpeed: data.kp_s, 
             kiSpeed: data.ki_s, 
             kdSpeed: data.kd_s, 
@@ -562,7 +572,7 @@
             const step = 10;
             
             row.querySelector('.tune-plus').addEventListener('click', () => {
-                input.value = Math.min(parseInt(input.value) + step, 1023); // ZMIANA: Uzycie limitu 1023
+                input.value = Math.min(parseInt(input.value) + step, 1023);
             }); 
             row.querySelector('.tune-minus').addEventListener('click', () => {
                 input.value = Math.max(parseInt(input.value) - step, 0);
@@ -643,8 +653,18 @@
         };
         
         setupGroupedInput(['minPwmLeftFwd', 'minPwmLeftBwd', 'minPwmRightFwd', 'minPwmRightBwd'], 'set_min_pwm_group', { 'minPwmLeftFwd': 'L_fwd', 'minPwmLeftBwd': 'L_bwd', 'minPwmRightFwd': 'R_fwd', 'minPwmRightBwd': 'R_bwd'});
-        setupGroupedInput(['joystickDeadzone', 'turnFactor', 'expoJoystick', 'maxSpeedJoystick'], 'set_joystick_tuning', { 'joystickDeadzone': 'deadzone', 'turnFactor': 'turnFactor', 'expoJoystick': 'expo', 'maxSpeedJoystick': 'maxSpeed' });
-        setupGroupedInput(['kpBalance', 'kiBalance', 'kdBalance', 'joystickAngleSensitivity'], 'balance_pid_update', { 'kpBalance': 'kp_b', 'kiBalance': 'ki_b', 'kdBalance': 'kd_b', 'joystickAngleSensitivity': 'angle_sensitivity' });
+        setupGroupedInput(['joystickDeadzone', 'turnFactor', 'expoJoystick', 'maxSpeedJoystick', 'joystickRampTime'], 'set_joystick_tuning', { 'joystickDeadzone': 'deadzone', 'turnFactor': 'turnFactor', 'expoJoystick': 'expo', 'maxSpeedJoystick': 'maxSpeed', 'joystickRampTime': 'rampTime' });
+        
+        setupGroupedInput(['kpBalance', 'kiBalance', 'kdBalance', 'joystickAngleSensitivity', 'kpBalanceHigh', 'kdBalanceHigh', 'balancePidDerivativeFilterAlpha'], 'balance_pid_update', { 
+            'kpBalance': 'kp_b', 
+            'kiBalance': 'ki_b', 
+            'kdBalance': 'kd_b', 
+            'joystickAngleSensitivity': 'angle_sensitivity',
+            'kpBalanceHigh': 'kp_b_high',
+            'kdBalanceHigh': 'kd_b_high',
+            'balancePidDerivativeFilterAlpha': 'filter_alpha'
+        });
+
         setupGroupedInput(['kpSpeed', 'kiSpeed', 'kdSpeed', 'maxTargetAngle', 'speedPidDeadband', 'speedToAngleRatio'], 'speed_pid_update', { 'kpSpeed': 'kp_s', 'kiSpeed': 'ki_s', 'kdSpeed': 'kd_s', 'maxTargetAngle': 'max_target_angle', 'speedPidDeadband': 'deadband_s', 'speedToAngleRatio': 'speed_to_angle_ratio' });
         setupGroupedInput(['kpPosition', 'kiPosition', 'kdPosition', 'maxTargetSpeed', 'positionPidDeadband'], 'position_pid_update', { 'kpPosition': 'kp_p', 'kiPosition': 'ki_p', 'kdPosition': 'kd_p', 'maxTargetSpeed': 'max_target_speed', 'positionPidDeadband': 'deadband_p' });
         setupGroupedInput(['kpRotation', 'kdRotation'], 'rotation_pid_update', { 'kpRotation': 'kp_r', 'kdRotation': 'kd_r' });
