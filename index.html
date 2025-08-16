@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 13.1-BT-STABLE</title>
+    <title>Robot Samo Balansujacy - Wersja 13.1-BT-STABLE (MOD 10-bit)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -84,7 +84,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 13.1-BT-STABLE</h1>
+    <h1>Robot Samo Balansujacy - Wersja 13.1-BT-STABLE (MOD 10-bit)</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -118,7 +118,7 @@
                 <strong>Status Kontrolera:</strong> <span id="gamepadStatus" style="font-weight:bold; color: #f7b731;">Brak</span>
                 <strong>Tryb Pracy:</strong> <span id="robotStateVal" style="font-weight:bold; color: #61dafb;">IDLE</span>
                 <strong>Czas Petli:</strong> <span id="loopTimeVal">0 &micro;s</span>
-                <strong>PWM Rozdzielczosc:</strong> <span id="pwmResolutionVal" style="font-weight:bold; color: #a2f279;">11-bit (2047)</span>
+                <strong>PWM Rozdzielczosc:</strong> <span id="pwmResolutionVal" style="font-weight:bold; color: #a2f279;">10-bit (1023)</span>
             </div>
             <div class="info-grid">
                 <strong>Kat (Pitch):</strong> <div class="angle-display"><span id="angleVal">0.0 &deg;</span><div class="angle-indicator-wrapper"><div id="angleIndicator" class="angle-indicator-needle"></div></div></div>
@@ -186,32 +186,32 @@
                     <div class="setting-container"><label for="motorBacklashInput">Luz silnika (impulsy)</label><div class="numeric-input-wrapper"><button id="motorBacklashMinus">-</button><input type="number" id="motorBacklashInput" min="0" max="200" step="1" value="2"><button id="motorBacklashPlus">+</button></div></div>
                 </div>
 
-                <button class="accordion-header" onclick="toggleAccordion(this)">1. Strojenie Min. PWM (11-bit)</button>
+                <button class="accordion-header" onclick="toggleAccordion(this)">1. Strojenie Min. PWM (10-bit)</button>
                 <div class="accordion-content">
                      <div class="pwm-info">
-                         <strong>NOWA ROZDZIELCZOSC:</strong> 11-bitowa (0-2047)<br>
-                         <strong>ZWIEKSZONA PRECYZJA:</strong> 2x wieksza rozdzielczosc niz poprzednio (0-1023)
+                         <strong>STANDARDOWA ROZDZIELCZOSC:</strong> 10-bitowa (0-1023)<br>
+                         <strong>CZESTOTLIWOSC:</strong> 30000 Hz
                      </div>
                      <p style="margin-top:0; margin-bottom:15px; text-align:left;">Podnies robota w powietrze! Ustaw PWM i kliknij 'Testuj', aby znalezc prog startowy silnika.</p>
-                     <div class="manual-tune-row" data-motor="left" data-direction="fwd"><label>Lewy (Przod)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="2047" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
-                     <div class="manual-tune-row" data-motor="left" data-direction="bwd"><label>Lewy (Tyl)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="2047" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
-                     <div class="manual-tune-row" data-motor="right" data-direction="fwd"><label>Prawy (Przod)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="2047" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
-                     <div class="manual-tune-row" data-motor="right" data-direction="bwd"><label>Prawy (Tyl)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="2047" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
+                     <div class="manual-tune-row" data-motor="left" data-direction="fwd"><label>Lewy (Przod)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="1023" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
+                     <div class="manual-tune-row" data-motor="left" data-direction="bwd"><label>Lewy (Tyl)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="1023" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
+                     <div class="manual-tune-row" data-motor="right" data-direction="fwd"><label>Prawy (Przod)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="1023" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
+                     <div class="manual-tune-row" data-motor="right" data-direction="bwd"><label>Prawy (Tyl)</label><div class="numeric-input-wrapper"><button class="tune-minus">-</button><input type="number" class="tune-input" min="0" max="1023" step="1" value="0"><button class="tune-plus">+</button></div><div><button class="test-btn">Testuj</button><button class="stop-btn">Stop</button></div></div>
                      <hr style="border-color: #4a4f58; margin: 15px 0;">
                      <div class="manual-tune-readout"><div>Enkoder L: <span id="manualEncoderL">0</span></div><div>Enkoder P: <span id="manualEncoderR">0</span></div></div>
                      <button id="manualTuneStopAll" style="width:100%; margin-top:15px; background-color:#ff6347;">ZATRZYMAJ WSZYSTKO</button>
                 </div>
 
-                <button class="accordion-header" onclick="toggleAccordion(this)">2. Ustawienia Min. PWM (11-bit)</button>
+                <button class="accordion-header" onclick="toggleAccordion(this)">2. Ustawienia Min. PWM (10-bit)</button>
                 <div class="accordion-content">
                     <div class="pwm-info">
-                        <strong>ZAKRES:</strong> 0-2047 (11-bit)<br>
-                        <strong>TYPOWE WARTOSCI:</strong> 1200-1400 dla wielu silnikow
+                        <strong>ZAKRES:</strong> 0-1023 (10-bit)<br>
+                        <strong>TYPOWE WARTOSCI:</strong> 600-700 dla wielu silnikow
                     </div>
-                    <div class="setting-block"><div class="setting-container"><label for="minPwmLeftFwdInput">Min. PWM L (Przod)</label><div class="numeric-input-wrapper"><button id="minPwmLeftFwdMinus">-</button><input type="number" id="minPwmLeftFwdInput" min="0" max="2047" step="1" value="1240"><button id="minPwmLeftFwdPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="minPwmLeftBwdInput">Min. PWM L (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmLeftBwdMinus">-</button><input type="number" id="minPwmLeftBwdInput" min="0" max="2047" step="1" value="1240"><button id="minPwmLeftBwdPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="minPwmRightFwdInput">Min. PWM P (Przod)</label><div class="numeric-input-wrapper"><button id="minPwmRightFwdMinus">-</button><input type="number" id="minPwmRightFwdInput" min="0" max="2047" step="1" value="1240"><button id="minPwmRightFwdPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="minPwmRightBwdInput">Min. PWM P (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmRightBwdMinus">-</button><input type="number" id="minPwmRightBwdInput" min="0" max="2047" step="1" value="1240"><button id="minPwmRightBwdPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="minPwmLeftFwdInput">Min. PWM L (Przod)</label><div class="numeric-input-wrapper"><button id="minPwmLeftFwdMinus">-</button><input type="number" id="minPwmLeftFwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmLeftFwdPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="minPwmLeftBwdInput">Min. PWM L (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmLeftBwdMinus">-</button><input type="number" id="minPwmLeftBwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmLeftBwdPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="minPwmRightFwdInput">Min. PWM P (Przod)</label><div class="numeric-input-wrapper"><button id="minPwmRightFwdMinus">-</button><input type="number" id="minPwmRightFwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmRightFwdPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="minPwmRightBwdInput">Min. PWM P (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmRightBwdMinus">-</button><input type="number" id="minPwmRightBwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmRightBwdPlus">+</button></div></div></div>
                 </div>
                 
                 <button class="accordion-header active" onclick="toggleAccordion(this)">3. Strojenie PID (Balans)</button>
@@ -265,7 +265,7 @@
     </div>
 <script>
     // --- ZMIENNE GLOBALNE I KONFIGURACJA ---
-    const PROFILE_PREFIX = 'robot_profile_v13.1_';
+    const PROFILE_PREFIX = 'robot_profile_v13.1_10bit_'; // ZMIANA: Nowy prefix dla profili 10-bit
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
         'target_angle': { label: 'Zadany Kat', color: '#a2f279' },
@@ -393,7 +393,7 @@
         document.getElementById('speedModeSwitch').checked = data.speedModeEnabled;
         
         if (data.pwm_max_value) {
-            document.getElementById('pwmResolutionVal').textContent = `11-bit (${data.pwm_max_value})`;
+            document.getElementById('pwmResolutionVal').textContent = `10-bit (${data.pwm_max_value})`;
         }
         
         const params = { 
@@ -562,7 +562,7 @@
             const step = 10;
             
             row.querySelector('.tune-plus').addEventListener('click', () => {
-                input.value = Math.min(parseInt(input.value) + step, 2047);
+                input.value = Math.min(parseInt(input.value) + step, 1023); // ZMIANA: Uzycie limitu 1023
             }); 
             row.querySelector('.tune-minus').addEventListener('click', () => {
                 input.value = Math.max(parseInt(input.value) - step, 0);
@@ -669,7 +669,7 @@
         document.querySelectorAll('#allSettings input[type=number], #controls-card input[type=number]').forEach(input => { profileData[input.id] = input.value; }); 
         document.querySelectorAll('#allSettings input[type=checkbox], #controls-card input[type=checkbox]').forEach(input => { profileData[input.id] = input.checked; }); 
         localStorage.setItem(PROFILE_PREFIX + name, JSON.stringify(profileData)); 
-        addLogMessage(`Zapisano profil: ${name} (v13.1)`, 'info'); 
+        addLogMessage(`Zapisano profil: ${name}`, 'info'); 
         loadProfiles(); 
     }
     
@@ -708,7 +708,7 @@
                     input.dispatchEvent(new Event('change', { bubbles: true })); 
                 } 
             }); 
-            addLogMessage('Wyslano wartosci z profilu do robota (v13.1).', 'info'); 
+            addLogMessage('Wyslano wartosci z profilu do robota.', 'info'); 
         }, 200); 
     }
     
@@ -766,7 +766,6 @@
         joystickCtx.fill(); 
     }
     
-    // === POPRAWKA 1: Prawidlowa obsluga zdarzen dotykowych ===
     function handleMove(e) { 
         if (!isDragging) return; 
         e.preventDefault(); 
@@ -812,7 +811,6 @@
     document.addEventListener('mouseup', endDrag); 
     document.addEventListener('touchend', endDrag);
     
-    // === POPRAWKA 2: Prawidlowa obsluga gamepada ===
     function pollGamepad() { 
         const gamepads = navigator.getGamepads(); 
         if (!gamepads[gamepadIndex]) return; 
@@ -844,7 +842,7 @@
         window.addEventListener("gamepaddisconnected", (event) => { 
             statusEl.textContent = 'Brak'; 
             statusEl.style.color = '#f7b731'; 
-            addLogMessage('Kontroler odlączony.', 'warn'); 
+            addLogMessage('Kontroler odlaczony.', 'warn'); 
             cancelAnimationFrame(gamepadPollInterval); 
         }); 
     }
