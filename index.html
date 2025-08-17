@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 14.3-PRO</title>
+    <title>Robot Samo Balansujacy - Wersja 14.4-PRO-FINAL</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -84,7 +84,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 14.3-PRO</h1>
+    <h1>Robot Samo Balansujacy - Wersja 14.4-PRO-FINAL</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -94,9 +94,12 @@
             <div class="control-row"><span class="control-label">Tryb Predkosci</span><label class="switch"><input type="checkbox" id="speedModeSwitch"><span class="slider round"></span></label></div>
             
             <fieldset style="padding: 10px 10px 5px 10px;"><legend>Strojenie Joysticka</legend>
-                <div class="setting-block" style="margin-bottom: 5px;"><div class="setting-container"><label for="expoJoystickInput">Expo Joysticka (%)</label><div class="numeric-input-wrapper"><button id="expoJoystickMinus">-</button><input type="number" id="expoJoystickInput" min="0" max="90" step="1" value="0"><button id="expoJoystickPlus">+</button></div></div></div>
-                <div class="setting-block"><div class="setting-container"><label for="maxSpeedJoystickInput">Max. predkosc (imp/s)</label><div class="numeric-input-wrapper"><button id="maxSpeedJoystickMinus">-</button><input type="number" id="maxSpeedJoystickInput" min="200" max="4000" step="100" value="1600"><button id="maxSpeedJoystickPlus">+</button></div></div></div>
-                <div class="setting-block"><div class="setting-container"><label for="joystickRampTimeInput">Rampa joysticka (s)</label><div class="numeric-input-wrapper"><button id="joystickRampTimeMinus">-</button><input type="number" id="joystickRampTimeInput" min="0" max="3.0" step="0.1" value="0.5"><button id="joystickRampTimePlus">+</button></div></div></div>
+                <div class="setting-block"><div class="setting-container"><label for="expoJoystickInput">Expo Joysticka (%)</label><div class="numeric-input-wrapper"><button id="expoJoystickMinus">-</button><input type="number" id="expoJoystickInput" min="0" max="90" step="1" value="0"><button id="expoJoystickPlus">+</button></div></div></div>
+                <div class="setting-block"><div class="setting-container"><label for="maxSpeedJoystickInput">Max. predkosc (imp/s)</label><div class="numeric-input-wrapper"><button id="maxSpeedJoystickMinus">-</button><input type="number" id="maxSpeedJoystickInput" min="200" max="4000" step="100" value="800"><button id="maxSpeedJoystickPlus">+</button></div></div></div>
+                <hr style="border-color: #4a4f58; margin: 10px 0;">
+                <p style="font-weight:bold; color: #61dafb; margin-top: 0; margin-bottom: 10px;">Ograniczenie narastania:</p>
+                <div class="setting-block"><div class="setting-container"><label for="joystickSlewRateAccelInput">Przyspieszanie (%/s)</label><div class="numeric-input-wrapper"><button id="joystickSlewRateAccelMinus">-</button><input type="number" id="joystickSlewRateAccelInput" min="50" max="2000" step="10" value="200"><button id="joystickSlewRateAccelPlus">+</button></div></div></div>
+                <div class="setting-block"><div class="setting-container"><label for="joystickSlewRateDecelInput">Kontrowanie (%/s)</label><div class="numeric-input-wrapper"><button id="joystickSlewRateDecelMinus">-</button><input type="number" id="joystickSlewRateDecelInput" min="50" max="4000" step="50" value="1000"><button id="joystickSlewRateDecelPlus">+</button></div></div></div>
             </fieldset>
             
             <hr style="border-color: #4a4f58; margin: 15px 0;">
@@ -220,43 +223,43 @@
                     <div class="setting-block"><div class="setting-container"><label for="joystickAngleSensitivityInput">Czulosc joysticka (kat)</label><div class="numeric-input-wrapper"><button id="joystickAngleSensitivityMinus">-</button><input type="number" id="joystickAngleSensitivityInput" min="1" max="25" step="1" value="15"><button id="joystickAngleSensitivityPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kpBalanceInput">Kp (Sztywnosc)</label><div class="numeric-input-wrapper"><button id="kpBalanceMinus">-</button><input type="number" id="kpBalanceInput" min="0" max="200" step="1" value="35"><button id="kpBalancePlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kiBalanceInput">Ki (Korekta bledu)</label><div class="numeric-input-wrapper"><button id="kiBalanceMinus">-</button><input type="number" id="kiBalanceInput" min="0" max="20" step="0.05" value="0"><button id="kiBalancePlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="kdBalanceInput">Kd (Tlumienie)</label><div class="numeric-input-wrapper"><button id="kdBalanceMinus">-</button><input type="number" id="kdBalanceInput" min="0" max="20" step="0.1" value="1.0"><button id="kdBalancePlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kdBalanceInput">Kd (Tlumienie)</label><div class="numeric-input-wrapper"><button id="kdBalanceMinus">-</button><input type="number" id="kdBalanceInput" min="0" max="20" step="0.1" value="3"><button id="kdBalancePlus">+</button></div></div></div>
                     <hr style="border-color: #4a4f58; margin: 10px 0;">
                     <p style="font-weight:bold; color: #61dafb; margin-top: 0;">Ustawienia zaawansowane:</p>
                     <div class="setting-block"><div class="setting-container"><label for="kpBalanceHighInput">Kp (Duza predkosc)</label><div class="numeric-input-wrapper"><button id="kpBalanceHighMinus">-</button><input type="number" id="kpBalanceHighInput" min="0" max="200" step="1" value="28"><button id="kpBalanceHighPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kdBalanceHighInput">Kd (Duza predkosc)</label><div class="numeric-input-wrapper"><button id="kdBalanceHighMinus">-</button><input type="number" id="kdBalanceHighInput" min="0" max="20" step="0.1" value="1.2"><button id="kdBalanceHighPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="balancePidDerivativeFilterAlphaInput">Filtr pochodnej (Alfa)</label><div class="numeric-input-wrapper"><button id="balancePidDerivativeFilterAlphaMinus">-</button><input type="number" id="balancePidDerivativeFilterAlphaInput" min="0.01" max="1.0" step="0.01" value="0.7"><button id="balancePidDerivativeFilterAlphaPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="balancePidDerivativeFilterAlphaInput">Filtr pochodnej (Alfa)</label><div class="numeric-input-wrapper"><button id="balancePidDerivativeFilterAlphaMinus">-</button><input type="number" id="balancePidDerivativeFilterAlphaInput" min="0.01" max="1.0" step="0.01" value="1"><button id="balancePidDerivativeFilterAlphaPlus">+</button></div></div></div>
                 </div>
                 
                 <button class="accordion-header" onclick="toggleAccordion(this)">4. Strojenie PID (Predkosc)</button>
                 <div class="accordion-content">
                     <div class="setting-block"><div class="setting-container"><label for="speedToAngleRatioInput">Stosunek predkosc/kat</label><div class="numeric-input-wrapper"><button id="speedToAngleRatioMinus">-</button><input type="number" id="speedToAngleRatioInput" min="0.001" max="1.0" step="0.001" value="0.05"><button id="speedToAngleRatioPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="maxTargetAngleInput">Max kat z PID Predkosci (st.)</label><div class="numeric-input-wrapper"><button id="maxTargetAngleMinus">-</button><input type="number" id="maxTargetAngleInput" min="1" max="20" step="1" value="12"><button id="maxTargetAnglePlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="kpSpeedInput">Kp Predkosci</label><div class="numeric-input-wrapper"><button id="kpSpeedMinus">-</button><input type="number" id="kpSpeedInput" min="0" max="5.0" step="0.001" value="0.08"><button id="kpSpeedPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="kiSpeedInput">Ki Predkosci</label><div class="numeric-input-wrapper"><button id="kiSpeedMinus">-</button><input type="number" id="kiSpeedInput" min="0" max="1.0" step="0.001" value="0.1"><button id="kiSpeedPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="kdSpeedInput">Kd Predkosci</label><div class="numeric-input-wrapper"><button id="kdSpeedMinus">-</button><input type="number" id="kdSpeedInput" min="0" max="1.0" step="0.001" value="0.01"><button id="kdSpeedPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="maxTargetAngleInput">Max kat z PID Predkosci (st.)</label><div class="numeric-input-wrapper"><button id="maxTargetAngleMinus">-</button><input type="number" id="maxTargetAngleInput" min="1" max="20" step="1" value="15"><button id="maxTargetAnglePlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kpSpeedInput">Kp Predkosci</label><div class="numeric-input-wrapper"><button id="kpSpeedMinus">-</button><input type="number" id="kpSpeedInput" min="0" max="5.0" step="0.01" value="0.05"><button id="kpSpeedPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kiSpeedInput">Ki Predkosci</label><div class="numeric-input-wrapper"><button id="kiSpeedMinus">-</button><input type="number" id="kiSpeedInput" min="0" max="1.0" step="0.001" value="0"><button id="kiSpeedPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kdSpeedInput">Kd Predkosci</label><div class="numeric-input-wrapper"><button id="kdSpeedMinus">-</button><input type="number" id="kdSpeedInput" min="0" max="1.0" step="0.001" value="0"><button id="kdSpeedPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="speedPidDeadbandInput">Margines bledu (imp/s)</label><div class="numeric-input-wrapper"><button id="speedPidDeadbandMinus">-</button><input type="number" id="speedPidDeadbandInput" min="0" max="100" step="1" value="5"><button id="speedPidDeadbandPlus">+</button></div></div></div>
                 </div>
 
                 <button class="accordion-header" onclick="toggleAccordion(this)">5. Strojenie PID (Pozycja)</button>
                 <div class="accordion-content">
-                    <div class="setting-block"><div class="setting-container"><label for="maxTargetSpeedInput">Max predkosc z PID Pozycji (imp/s)</label><div class="numeric-input-wrapper"><button id="maxTargetSpeedMinus">-</button><input type="number" id="maxTargetSpeedInput" min="200" max="4000" step="100" value="1200"><button id="maxTargetSpeedPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="kpPositionInput">Kp Pozycji</label><div class="numeric-input-wrapper"><button id="kpPositionMinus">-</button><input type="number" id="kpPositionInput" min="0" max="5.0" step="0.05" value="0.55"><button id="kpPositionPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="maxTargetSpeedInput">Max predkosc z PID Pozycji (imp/s)</label><div class="numeric-input-wrapper"><button id="maxTargetSpeedMinus">-</button><input type="number" id="maxTargetSpeedInput" min="200" max="4000" step="100" value="600"><button id="maxTargetSpeedPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kpPositionInput">Kp Pozycji</label><div class="numeric-input-wrapper"><button id="kpPositionMinus">-</button><input type="number" id="kpPositionInput" min="0" max="5.0" step="0.05" value="0.2"><button id="kpPositionPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kiPositionInput">Ki Pozycji</label><div class="numeric-input-wrapper"><button id="kiPositionMinus">-</button><input type="number" id="kiPositionInput" min="0" max="0.1" step="0.001" value="0"><button id="kiPositionPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="kdPositionInput">Kd Pozycji</label><div class="numeric-input-wrapper"><button id="kdPositionMinus">-</button><input type="number" id="kdPositionInput" min="0" max="5.0" step="0.01" value="0.27"><button id="kdPositionPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kdPositionInput">Kd Pozycji</label><div class="numeric-input-wrapper"><button id="kdPositionMinus">-</button><input type="number" id="kdPositionInput" min="0" max="5.0" step="0.01" value="0.2"><button id="kdPositionPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="positionPidDeadbandInput">Margines bledu (impulsy)</label><div class="numeric-input-wrapper"><button id="positionPidDeadbandMinus">-</button><input type="number" id="positionPidDeadbandInput" min="0" max="100" step="1" value="10"><button id="positionPidDeadbandPlus">+</button></div></div></div>
                 </div>
                 
                 <button class="accordion-header" onclick="toggleAccordion(this)">6. Strojenie PID (Obrot)</button>
                 <div class="accordion-content">
-                    <div class="setting-block"><div class="setting-container"><label for="kpRotationInput">Kp Obrotu</label><div class="numeric-input-wrapper"><button id="kpRotationMinus">-</button><input type="number" id="kpRotationInput" min="0" max="10.0" step="0.1" value="1.1"><button id="kpRotationPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="kdRotationInput">Kd Obrotu</label><div class="numeric-input-wrapper"><button id="kdRotationMinus">-</button><input type="number" id="kdRotationInput" min="0" max="10.0" step="0.1" value="1.6"><button id="kdRotationPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kpRotationInput">Kp Obrotu</label><div class="numeric-input-wrapper"><button id="kpRotationMinus">-</button><input type="number" id="kpRotationInput" min="0" max="10.0" step="0.1" value="2"><button id="kpRotationPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kdRotationInput">Kd Obrotu</label><div class="numeric-input-wrapper"><button id="kdRotationMinus">-</button><input type="number" id="kdRotationInput" min="0" max="10.0" step="0.1" value="2"><button id="kdRotationPlus">+</button></div></div></div>
                 </div>
 
                 <button class="accordion-header" onclick="toggleAccordion(this)">7. Ustawienia Dodatkowe</button>
                 <div class="accordion-content">
                     <div class="setting-block"><div class="setting-container"><label for="joystickDeadzoneInput">Martwa Strefa (%)</label><div class="numeric-input-wrapper"><button id="joystickDeadzoneMinus">-</button><input type="number" id="joystickDeadzoneInput" min="0" max="50" step="1" value="5"><button id="joystickDeadzonePlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="turnFactorInput">Moc Skretu (%)</label><div class="numeric-input-wrapper"><button id="turnFactorMinus">-</button><input type="number" id="turnFactorInput" min="0" max="100" step="1" value="30"><button id="turnFactorPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="turnFactorInput">Moc Skretu (%)</label><div class="numeric-input-wrapper"><button id="turnFactorMinus">-</button><input type="number" id="turnFactorInput" min="0" max="100" step="1" value="20"><button id="turnFactorPlus">+</button></div></div></div>
                 </div>
             </div>
             <div class="button-group" style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
@@ -270,8 +273,7 @@
         </div>
     </div>
 <script>
-    // --- ZMIENNE GLOBALNE I KONFIGURACJA ---
-    const PROFILE_PREFIX = 'robot_profile_v14.3_pro_';
+    const PROFILE_PREFIX = 'robot_profile_v14.4_pro_slew_';
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
         'target_angle': { label: 'Zadany Kat', color: '#a2f279' },
@@ -405,7 +407,8 @@
         const params = { 
             expoJoystick: data.expo_joystick, 
             maxSpeedJoystick: data.max_speed_joystick,
-            joystickRampTime: data.joystick_ramp_time,
+            joystickSlewRateAccel: data.joystick_slew_rate_accel,
+            joystickSlewRateDecel: data.joystick_slew_rate_decel,
             minPwmLeftFwd: data.min_pwm_left_fwd, 
             minPwmLeftBwd: data.min_pwm_left_bwd, 
             minPwmRightFwd: data.min_pwm_right_fwd, 
@@ -653,7 +656,14 @@
         };
         
         setupGroupedInput(['minPwmLeftFwd', 'minPwmLeftBwd', 'minPwmRightFwd', 'minPwmRightBwd'], 'set_min_pwm_group', { 'minPwmLeftFwd': 'L_fwd', 'minPwmLeftBwd': 'L_bwd', 'minPwmRightFwd': 'R_fwd', 'minPwmRightBwd': 'R_bwd'});
-        setupGroupedInput(['joystickDeadzone', 'turnFactor', 'expoJoystick', 'maxSpeedJoystick', 'joystickRampTime'], 'set_joystick_tuning', { 'joystickDeadzone': 'deadzone', 'turnFactor': 'turnFactor', 'expoJoystick': 'expo', 'maxSpeedJoystick': 'maxSpeed', 'joystickRampTime': 'rampTime' });
+        setupGroupedInput(['joystickDeadzone', 'turnFactor', 'expoJoystick', 'maxSpeedJoystick', 'joystickSlewRateAccel', 'joystickSlewRateDecel'], 'set_joystick_tuning', { 
+            'joystickDeadzone': 'deadzone', 
+            'turnFactor': 'turnFactor', 
+            'expoJoystick': 'expo', 
+            'maxSpeedJoystick': 'maxSpeed',
+            'joystickSlewRateAccel': 'slewAccel',
+            'joystickSlewRateDecel': 'slewDecel'
+        });
         
         setupGroupedInput(['kpBalance', 'kiBalance', 'kdBalance', 'joystickAngleSensitivity', 'kpBalanceHigh', 'kdBalanceHigh', 'balancePidDerivativeFilterAlpha'], 'balance_pid_update', { 
             'kpBalance': 'kp_b', 
