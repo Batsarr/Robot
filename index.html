@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 14.4-PRO-FINAL</title>
+    <title>Robot Samo Balansujacy - Wersja 16.0-AUTOTUNE</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -84,7 +84,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 14.4-PRO-FINAL</h1>
+    <h1>Robot Samo Balansujacy - Wersja 16.0-AUTOTUNE</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -218,7 +218,16 @@
                     <div class="setting-block"><div class="setting-container"><label for="minPwmRightBwdInput">Min. PWM P (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmRightBwdMinus">-</button><input type="number" id="minPwmRightBwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmRightBwdPlus">+</button></div></div></div>
                 </div>
                 
-                <button class="accordion-header active" onclick="toggleAccordion(this)">3. Strojenie PID (Balans)</button>
+                <button class="accordion-header" onclick="toggleAccordion(this)">3. Auto-Kalibracja PID (Balans)</button>
+                <div class="accordion-content">
+                    <p style="margin-top:0; margin-bottom:15px; text-align:left;">Ustaw robota na podlodze i rozpocznij test. Robot bedzie sie kolysal przez kilkanascie sekund. Po tescie, sugerowane wartosci Kp i Kd pojawia sie w logach.</p>
+                    <div class="setting-block"><div class="setting-container"><label for="calibrationPowerInput">Sila Pobudzenia (PWM)</label><div class="numeric-input-wrapper"><button id="calibrationPowerMinus">-</button><input type="number" id="calibrationPowerInput" min="100" max="1023" step="10" value="620"><button id="calibrationPowerPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="calibrationCyclesInput">Liczba Cykli</label><div class="numeric-input-wrapper"><button id="calibrationCyclesMinus">-</button><input type="number" id="calibrationCyclesInput" min="3" max="10" step="1" value="5"><button id="calibrationCyclesPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="calibrationHysteresisInput">Histereza Kata (st.)</label><div class="numeric-input-wrapper"><button id="calibrationHysteresisMinus">-</button><input type="number" id="calibrationHysteresisInput" min="0.1" max="2.0" step="0.1" value="0.2"><button id="calibrationHysteresisPlus">+</button></div></div></div>
+                    <button id="startPidCalibrationBtn" style="width:100%; margin-top:15px; background-color:#f7b731;">Start Auto-Kalibracji PID</button>
+                </div>
+
+                <button class="accordion-header active" onclick="toggleAccordion(this)">4. Strojenie PID (Balans)</button>
                 <div class="accordion-content active">
                     <div class="setting-block"><div class="setting-container"><label for="joystickAngleSensitivityInput">Czulosc joysticka (kat)</label><div class="numeric-input-wrapper"><button id="joystickAngleSensitivityMinus">-</button><input type="number" id="joystickAngleSensitivityInput" min="1" max="25" step="1" value="15"><button id="joystickAngleSensitivityPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kpBalanceInput">Kp (Sztywnosc)</label><div class="numeric-input-wrapper"><button id="kpBalanceMinus">-</button><input type="number" id="kpBalanceInput" min="0" max="200" step="1" value="35"><button id="kpBalancePlus">+</button></div></div></div>
@@ -231,7 +240,7 @@
                     <div class="setting-block"><div class="setting-container"><label for="balancePidDerivativeFilterAlphaInput">Filtr pochodnej (Alfa)</label><div class="numeric-input-wrapper"><button id="balancePidDerivativeFilterAlphaMinus">-</button><input type="number" id="balancePidDerivativeFilterAlphaInput" min="0.01" max="1.0" step="0.01" value="1"><button id="balancePidDerivativeFilterAlphaPlus">+</button></div></div></div>
                 </div>
                 
-                <button class="accordion-header" onclick="toggleAccordion(this)">4. Strojenie PID (Predkosc)</button>
+                <button class="accordion-header" onclick="toggleAccordion(this)">5. Strojenie PID (Predkosc)</button>
                 <div class="accordion-content">
                     <div class="setting-block"><div class="setting-container"><label for="speedToAngleRatioInput">Stosunek predkosc/kat</label><div class="numeric-input-wrapper"><button id="speedToAngleRatioMinus">-</button><input type="number" id="speedToAngleRatioInput" min="0.001" max="1.0" step="0.001" value="0.05"><button id="speedToAngleRatioPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="maxTargetAngleInput">Max kat z PID Predkosci (st.)</label><div class="numeric-input-wrapper"><button id="maxTargetAngleMinus">-</button><input type="number" id="maxTargetAngleInput" min="1" max="20" step="1" value="15"><button id="maxTargetAnglePlus">+</button></div></div></div>
@@ -241,7 +250,7 @@
                     <div class="setting-block"><div class="setting-container"><label for="speedPidDeadbandInput">Margines bledu (imp/s)</label><div class="numeric-input-wrapper"><button id="speedPidDeadbandMinus">-</button><input type="number" id="speedPidDeadbandInput" min="0" max="100" step="1" value="5"><button id="speedPidDeadbandPlus">+</button></div></div></div>
                 </div>
 
-                <button class="accordion-header" onclick="toggleAccordion(this)">5. Strojenie PID (Pozycja)</button>
+                <button class="accordion-header" onclick="toggleAccordion(this)">6. Strojenie PID (Pozycja)</button>
                 <div class="accordion-content">
                     <div class="setting-block"><div class="setting-container"><label for="maxTargetSpeedInput">Max predkosc z PID Pozycji (imp/s)</label><div class="numeric-input-wrapper"><button id="maxTargetSpeedMinus">-</button><input type="number" id="maxTargetSpeedInput" min="200" max="4000" step="100" value="600"><button id="maxTargetSpeedPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kpPositionInput">Kp Pozycji</label><div class="numeric-input-wrapper"><button id="kpPositionMinus">-</button><input type="number" id="kpPositionInput" min="0" max="5.0" step="0.05" value="0.2"><button id="kpPositionPlus">+</button></div></div></div>
@@ -250,13 +259,13 @@
                     <div class="setting-block"><div class="setting-container"><label for="positionPidDeadbandInput">Margines bledu (impulsy)</label><div class="numeric-input-wrapper"><button id="positionPidDeadbandMinus">-</button><input type="number" id="positionPidDeadbandInput" min="0" max="100" step="1" value="10"><button id="positionPidDeadbandPlus">+</button></div></div></div>
                 </div>
                 
-                <button class="accordion-header" onclick="toggleAccordion(this)">6. Strojenie PID (Obrot)</button>
+                <button class="accordion-header" onclick="toggleAccordion(this)">7. Strojenie PID (Obrot)</button>
                 <div class="accordion-content">
                     <div class="setting-block"><div class="setting-container"><label for="kpRotationInput">Kp Obrotu</label><div class="numeric-input-wrapper"><button id="kpRotationMinus">-</button><input type="number" id="kpRotationInput" min="0" max="10.0" step="0.1" value="2"><button id="kpRotationPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kdRotationInput">Kd Obrotu</label><div class="numeric-input-wrapper"><button id="kdRotationMinus">-</button><input type="number" id="kdRotationInput" min="0" max="10.0" step="0.1" value="2"><button id="kdRotationPlus">+</button></div></div></div>
                 </div>
 
-                <button class="accordion-header" onclick="toggleAccordion(this)">7. Ustawienia Dodatkowe</button>
+                <button class="accordion-header" onclick="toggleAccordion(this)">8. Ustawienia Dodatkowe</button>
                 <div class="accordion-content">
                     <div class="setting-block"><div class="setting-container"><label for="joystickDeadzoneInput">Martwa Strefa (%)</label><div class="numeric-input-wrapper"><button id="joystickDeadzoneMinus">-</button><input type="number" id="joystickDeadzoneInput" min="0" max="50" step="1" value="5"><button id="joystickDeadzonePlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="turnFactorInput">Moc Skretu (%)</label><div class="numeric-input-wrapper"><button id="turnFactorMinus">-</button><input type="number" id="turnFactorInput" min="0" max="100" step="1" value="20"><button id="turnFactorPlus">+</button></div></div></div>
@@ -273,7 +282,7 @@
         </div>
     </div>
 <script>
-    const PROFILE_PREFIX = 'robot_profile_v14.4_pro_slew_';
+    const PROFILE_PREFIX = 'robot_profile_v16.0_autotune_';
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
         'target_angle': { label: 'Zadany Kat', color: '#a2f279' },
@@ -409,6 +418,9 @@
             maxSpeedJoystick: data.max_speed_joystick,
             joystickSlewRateAccel: data.joystick_slew_rate_accel,
             joystickSlewRateDecel: data.joystick_slew_rate_decel,
+            calibrationPower: data.calibration_power,
+            calibrationCycles: data.calibration_cycles,
+            calibrationHysteresis: data.calibration_hysteresis,
             minPwmLeftFwd: data.min_pwm_left_fwd, 
             minPwmLeftBwd: data.min_pwm_left_bwd, 
             minPwmRightFwd: data.min_pwm_right_fwd, 
@@ -615,6 +627,17 @@
         document.getElementById('resetEncodersBtn').addEventListener('click', () => sendBleMessage({ type: 'reset_encoders' }));
         document.getElementById('calibrateMpuBtn').addEventListener('click', () => sendBleMessage({ type: 'calibrate_mpu' }));
         
+        document.getElementById('startPidCalibrationBtn').addEventListener('click', () => {
+            if(document.getElementById('balanceSwitch').checked) {
+                alert("Wylacz balansowanie przed rozpoczeciem kalibracji!");
+                return;
+            }
+            if(confirm("Robot zacznie sie kolysac. Upewnij sie, ze stoi na podlodze i ma miejsce. Kontynuowac?")) {
+                sendBleMessage({ type: 'start_pid_calibration' });
+                addLogMessage("Rozpoczeto procedure auto-kalibracji PID...", "warn");
+            }
+        });
+
         const setupGroupedInput = (ids, msgType, keyMapping) => { 
             ids.forEach(id => { 
                 const input = document.getElementById(id + 'Input'), minusBtn = document.getElementById(id + 'Minus'), plusBtn = document.getElementById(id + 'Plus'); 
@@ -657,22 +680,17 @@
         
         setupGroupedInput(['minPwmLeftFwd', 'minPwmLeftBwd', 'minPwmRightFwd', 'minPwmRightBwd'], 'set_min_pwm_group', { 'minPwmLeftFwd': 'L_fwd', 'minPwmLeftBwd': 'L_bwd', 'minPwmRightFwd': 'R_fwd', 'minPwmRightBwd': 'R_bwd'});
         setupGroupedInput(['joystickDeadzone', 'turnFactor', 'expoJoystick', 'maxSpeedJoystick', 'joystickSlewRateAccel', 'joystickSlewRateDecel'], 'set_joystick_tuning', { 
-            'joystickDeadzone': 'deadzone', 
-            'turnFactor': 'turnFactor', 
-            'expoJoystick': 'expo', 
-            'maxSpeedJoystick': 'maxSpeed',
-            'joystickSlewRateAccel': 'slewAccel',
-            'joystickSlewRateDecel': 'slewDecel'
+            'joystickDeadzone': 'deadzone', 'turnFactor': 'turnFactor', 'expoJoystick': 'expo', 'maxSpeedJoystick': 'maxSpeed',
+            'joystickSlewRateAccel': 'slewAccel', 'joystickSlewRateDecel': 'slewDecel'
         });
         
         setupGroupedInput(['kpBalance', 'kiBalance', 'kdBalance', 'joystickAngleSensitivity', 'kpBalanceHigh', 'kdBalanceHigh', 'balancePidDerivativeFilterAlpha'], 'balance_pid_update', { 
-            'kpBalance': 'kp_b', 
-            'kiBalance': 'ki_b', 
-            'kdBalance': 'kd_b', 
-            'joystickAngleSensitivity': 'angle_sensitivity',
-            'kpBalanceHigh': 'kp_b_high',
-            'kdBalanceHigh': 'kd_b_high',
-            'balancePidDerivativeFilterAlpha': 'filter_alpha'
+            'kpBalance': 'kp_b', 'kiBalance': 'ki_b', 'kdBalance': 'kd_b', 'joystickAngleSensitivity': 'angle_sensitivity',
+            'kpBalanceHigh': 'kp_b_high', 'kdBalanceHigh': 'kd_b_high', 'balancePidDerivativeFilterAlpha': 'filter_alpha'
+        });
+
+        setupGroupedInput(['calibrationPower', 'calibrationCycles', 'calibrationHysteresis'], 'set_calibration_params', {
+            'calibrationPower': 'power', 'calibrationCycles': 'cycles', 'calibrationHysteresis': 'hysteresis'
         });
 
         setupGroupedInput(['kpSpeed', 'kiSpeed', 'kdSpeed', 'maxTargetAngle', 'speedPidDeadband', 'speedToAngleRatio'], 'speed_pid_update', { 'kpSpeed': 'kp_s', 'kiSpeed': 'ki_s', 'kdSpeed': 'kd_s', 'maxTargetAngle': 'max_target_angle', 'speedPidDeadband': 'deadband_s', 'speedToAngleRatio': 'speed_to_angle_ratio' });
