@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 15.1-CLEAN</title>
+    <title>Robot Samo Balansujacy - Wersja 15.2-DYNAMICS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -84,7 +84,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 15.1-CLEAN</h1>
+    <h1>Robot Samo Balansujacy - Wersja 15.2-DYNAMICS</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -122,6 +122,7 @@
             </div>
             <div class="info-grid">
                 <strong>Kat (Pitch):</strong> <div class="angle-display"><span id="angleVal">0.0 &deg;</span><div class="angle-indicator-wrapper"><div id="angleIndicator" class="angle-indicator-needle"></div></div></div>
+                <strong>Kat (Roll):</strong> <span id="rollVal">0.0 &deg;</span>
                 <strong>Predkosc (imp/s):</strong> <span id="speedVal">0</span>
                 <strong>Zadany Kat:</strong> <span id="targetAngleVal">0.0 &deg;</span>
                 <hr style="grid-column: 1 / -1; border-color: #4a4f58; margin: 5px 0;">
@@ -178,12 +179,14 @@
             </fieldset>
             
             <div id="allSettings">
-                <button class="accordion-header" onclick="toggleAccordion(this)">0. Konfiguracja Fizyczna</button>
+                <button class="accordion-header" onclick="toggleAccordion(this)">0. Konfiguracja Fizyczna i Dynamika</button>
                 <div class="accordion-content">
                     <div class="setting-container"><label for="encoderPPRInput">Impulsy na obrot (PPR)</label><div class="numeric-input-wrapper"><button id="encoderPPRMinus">-</button><input type="number" id="encoderPPRInput" min="100" max="5000" step="1" value="820"><button id="encoderPPRPlus">+</button></div></div>
                     <div class="setting-container"><label for="wheelDiameterCmInput">Srednica kola (cm)</label><div class="numeric-input-wrapper"><button id="wheelDiameterCmMinus">-</button><input type="number" id="wheelDiameterCmInput" min="1" max="20" step="0.1" value="8.0"><button id="wheelDiameterCmPlus">+</button></div></div>
                     <div class="setting-container"><label for="trackWidthCmInput">Rozstaw kol (cm)</label><div class="numeric-input-wrapper"><button id="trackWidthCmMinus">-</button><input type="number" id="trackWidthCmInput" min="1" max="40" step="0.1" value="17.0"><button id="trackWidthCmPlus">+</button></div></div>
                     <div class="setting-container"><label for="motorBacklashInput">Luz silnika (impulsy)</label><div class="numeric-input-wrapper"><button id="motorBacklashMinus">-</button><input type="number" id="motorBacklashInput" min="0" max="200" step="1" value="2"><button id="motorBacklashPlus">+</button></div></div>
+                    <hr style="border-color: #4a4f58; margin: 10px 0;">
+                    <div class="setting-container"><label for="turnToRollFactorInput">Wsp. Pochylania w Zakrecie</label><div class="numeric-input-wrapper"><button id="turnToRollFactorMinus">-</button><input type="number" id="turnToRollFactorInput" min="0" max="0.05" step="0.001" value="0.005"><button id="turnToRollFactorPlus">+</button></div></div>
                 </div>
 
                 <button class="accordion-header" onclick="toggleAccordion(this)">1. Strojenie Min. PWM (10-bit)</button>
@@ -213,7 +216,7 @@
                     <div class="setting-block"><div class="setting-container"><label for="minPwmRightFwdInput">Min. PWM P (Przod)</label><div class="numeric-input-wrapper"><button id="minPwmRightFwdMinus">-</button><input type="number" id="minPwmRightFwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmRightFwdPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="minPwmRightBwdInput">Min. PWM P (Tyl)</label><div class="numeric-input-wrapper"><button id="minPwmRightBwdMinus">-</button><input type="number" id="minPwmRightBwdInput" min="0" max="1023" step="1" value="620"><button id="minPwmRightBwdPlus">+</button></div></div></div>
                 </div>
-
+                
                 <button class="accordion-header active" onclick="toggleAccordion(this)">3. Strojenie PID (Balans)</button>
                 <div class="accordion-content active">
                     <div class="setting-block"><div class="setting-container"><label for="joystickAngleSensitivityInput">Czulosc joysticka (kat)</label><div class="numeric-input-wrapper"><button id="joystickAngleSensitivityMinus">-</button><input type="number" id="joystickAngleSensitivityInput" min="1" max="25" step="1" value="15"><button id="joystickAngleSensitivityPlus">+</button></div></div></div>
@@ -228,7 +231,7 @@
                 <button class="accordion-header" onclick="toggleAccordion(this)">4. Strojenie PID (Predkosc)</button>
                 <div class="accordion-content">
                     <div class="setting-block"><div class="setting-container"><label for="speedToAngleRatioInput">Stosunek predkosc/kat</label><div class="numeric-input-wrapper"><button id="speedToAngleRatioMinus">-</button><input type="number" id="speedToAngleRatioInput" min="0.001" max="1.0" step="0.001" value="0.05"><button id="speedToAngleRatioPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="maxTargetAngleInput">Max kat z PID Predkosci (st.)</label><div class="numeric-input-wrapper"><button id="maxTargetAngleMinus">-</button><input type="number" id="maxTargetAngleInput" min="1" max="20" step="1" value="15"><button id="maxTargetAnglePlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="maxTargetAngleFromSpeedPIDInput">Max Kat z PID Predkosci (st.)</label><div class="numeric-input-wrapper"><button id="maxTargetAngleFromSpeedPIDMinus">-</button><input type="number" id="maxTargetAngleFromSpeedPIDInput" min="1" max="20" step="1" value="15"><button id="maxTargetAngleFromSpeedPIDPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kpSpeedInput">Kp Predkosci</label><div class="numeric-input-wrapper"><button id="kpSpeedMinus">-</button><input type="number" id="kpSpeedInput" min="0" max="5.0" step="0.01" value="0.05"><button id="kpSpeedPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kiSpeedInput">Ki Predkosci</label><div class="numeric-input-wrapper"><button id="kiSpeedMinus">-</button><input type="number" id="kiSpeedInput" min="0" max="1.0" step="0.001" value="0"><button id="kiSpeedPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kdSpeedInput">Kd Predkosci</label><div class="numeric-input-wrapper"><button id="kdSpeedMinus">-</button><input type="number" id="kdSpeedInput" min="0" max="1.0" step="0.001" value="0"><button id="kdSpeedPlus">+</button></div></div></div>
@@ -267,9 +270,10 @@
         </div>
     </div>
 <script>
-    const PROFILE_PREFIX = 'robot_profile_v15.1_clean_';
+    const PROFILE_PREFIX = 'robot_profile_v15.2_dynamics_';
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
+        'roll': { label: 'Roll (Kat)', color: '#fd79a8' },
         'target_angle': { label: 'Zadany Kat', color: '#a2f279' },
         'speed': { label: 'Predkosc', color: '#f7b731' },
         'speed_setpoint': { label: 'Zadana Predkosc', color: '#ff6347' },
@@ -424,11 +428,12 @@
             encoderPPR: data.encoder_ppr, 
             wheelDiameterCm: data.wheel_diameter_cm, 
             trackWidthCm: data.track_width_cm, 
-            maxTargetAngle: data.max_target_angle, 
+            maxTargetAngleFromSpeedPID: data.max_target_angle,
             maxTargetSpeed: data.max_target_speed, 
             speedToAngleRatio: data.speed_to_angle_ratio, 
             speedPidDeadband: data.speed_pid_deadband, 
-            positionPidDeadband: data.position_pid_deadband 
+            positionPidDeadband: data.position_pid_deadband,
+            turnToRollFactor: data.turn_to_roll_factor
         };
         
         for (const [key, value] of Object.entries(params)) { 
@@ -444,6 +449,7 @@
             document.getElementById('angleVal').textContent = displayPitch.toFixed(1) + ' \u00B0'; 
             document.getElementById('angleIndicator').style.transform = 'rotate(' + displayPitch + 'deg)'; 
         }
+        if (data.roll !== undefined) document.getElementById('rollVal').textContent = data.roll.toFixed(1) + ' \u00B0';
         if (data.speed !== undefined) document.getElementById('speedVal').textContent = parseFloat(data.speed).toFixed(0);
         if (data.target_angle !== undefined) { 
             finalTargetAngleForDisplay = data.target_angle; 
@@ -655,10 +661,10 @@
             'balancePidDerivativeFilterAlpha': 'filter_alpha'
         });
 
-        setupGroupedInput(['kpSpeed', 'kiSpeed', 'kdSpeed', 'maxTargetAngle', 'speedPidDeadband', 'speedToAngleRatio'], 'speed_pid_update', { 'kpSpeed': 'kp_s', 'kiSpeed': 'ki_s', 'kdSpeed': 'kd_s', 'maxTargetAngle': 'max_target_angle', 'speedPidDeadband': 'deadband_s', 'speedToAngleRatio': 'speed_to_angle_ratio' });
+        setupGroupedInput(['kpSpeed', 'kiSpeed', 'kdSpeed', 'maxTargetAngleFromSpeedPID', 'speedPidDeadband', 'speedToAngleRatio'], 'speed_pid_update', { 'kpSpeed': 'kp_s', 'kiSpeed': 'ki_s', 'kdSpeed': 'kd_s', 'maxTargetAngleFromSpeedPID': 'max_target_angle', 'speedPidDeadband': 'deadband_s', 'speedToAngleRatio': 'speed_to_angle_ratio' });
         setupGroupedInput(['kpPosition', 'kiPosition', 'kdPosition', 'maxTargetSpeed', 'positionPidDeadband'], 'position_pid_update', { 'kpPosition': 'kp_p', 'kiPosition': 'ki_p', 'kdPosition': 'kd_p', 'maxTargetSpeed': 'max_target_speed', 'positionPidDeadband': 'deadband_p' });
         setupGroupedInput(['kpRotation', 'kdRotation'], 'rotation_pid_update', { 'kpRotation': 'kp_r', 'kdRotation': 'kd_r' });
-        setupGroupedInput(['encoderPPR', 'wheelDiameterCm', 'trackWidthCm', 'motorBacklash'], 'calibration_update', { 'encoderPPR': 'ppr', 'wheelDiameterCm': 'wheel_diameter', 'trackWidthCm': 'track_width', 'motorBacklash': 'backlash'});
+        setupGroupedInput(['encoderPPR', 'wheelDiameterCm', 'trackWidthCm', 'motorBacklash', 'turnToRollFactor'], 'calibration_update', { 'encoderPPR': 'ppr', 'wheelDiameterCm': 'wheel_diameter', 'trackWidthCm': 'track_width', 'motorBacklash': 'backlash', 'turnToRollFactor': 'turn_to_roll'});
         
         setupManualTuningControls();
         setupDpadControls();
