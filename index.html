@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Robot Samo Balansujacy - Wersja 16.6-FINAL-3D</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/examples/js/controls/OrbitControls.js"></script>
+    <!-- Zmieniono kolejnosc i dodano 'defer', aby zagwarantowac poprawne ladowanie -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/examples/js/controls/OrbitControls.js" defer></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
         h1 { color: #61dafb; font-size: 1.8em; }
@@ -557,8 +558,6 @@
             const pitchRad = data.pitch * degToRad;
             const rollRad = data.roll * degToRad;
             
-            robotModel.rotation.set(pitchRad, 0, rollRad, 'YXZ');
-
             const wheelCircumferenceM = (Math.PI * WHEEL_DIAMETER_CM) / 100.0;
             const trackWidthM = TRACK_WIDTH_CM / 100.0;
             
@@ -574,8 +573,11 @@
             const distanceCenter = (distanceLeft + distanceRight) / 2.0;
             const rotationAngleRad = (distanceRight - distanceLeft) / trackWidthM;
             
-            robotModel.position.z = -distanceCenter * 10; // Mnożnik skali dla lepszej widoczności
-            robotModel.rotation.y = -rotationAngleRad;
+            const newPosX = Math.sin(rotationAngleRad) * distanceCenter;
+            const newPosZ = Math.cos(rotationAngleRad) * distanceCenter;
+            
+            robotModel.position.set(newPosX * 100, 0, -newPosZ * 100); 
+            robotModel.rotation.set(pitchRad, -rotationAngleRad, rollRad, 'YXZ');
         }
     }
     
@@ -1014,105 +1016,117 @@
         const container = document.getElementById('canvas-3d-container');
         if (!container) return;
 
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x20232a);
-
-        camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 10, 25); 
-
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        container.appendChild(renderer.domElement);
-
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enablePan = false;
-        controls.target.set(0, 2, 0); 
-        controls.update();
-
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-        scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-        directionalLight.position.set(10, 20, 15);
-        scene.add(directionalLight);
-        
         const loader = new THREE.TextureLoader();
-        const floorTexture = loader.load('https://i.imgur.com/Vp6taA2.jpg', function(texture) {
-            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(10, 10);
-        });
-        const floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
-        const floorGeometry = new THREE.PlaneGeometry(200, 200);
-        floor = new THREE.Mesh(floorGeometry, floorMaterial);
-        floor.rotation.x = -Math.PI / 2;
-        floor.position.y = -1.5; 
-        scene.add(floor);
+        loader.load('https://i.imgur.com/gA3t1d3.jpg', 
+            function (texture) {
+                // Ta funkcja zostanie wywolana DOPIERO po zaladowaniu tekstury
+                
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x20232a);
 
-        robotModel = new THREE.Group();
-        
-        const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x1A1A1A, roughness: 0.6 });
-        const body = new THREE.Mesh(new THREE.BoxGeometry(10, 3, 5), bodyMaterial);
-        body.position.y = 0;
-        robotModel.add(body);
+                camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+                camera.position.set(0, 8, 25); 
 
-        const mast = new THREE.Mesh(new THREE.BoxGeometry(1.5, 7, 1.5), bodyMaterial);
-        mast.position.y = 5;
-        robotModel.add(mast);
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                container.appendChild(renderer.domElement);
 
-        const batteryMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFF00, roughness: 0.8 });
-        const battery = new THREE.Mesh(new THREE.BoxGeometry(4, 2, 1), batteryMaterial);
-        battery.position.set(0, 9.5, -0.5);
-        robotModel.add(battery);
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enablePan = false;
+                controls.target.set(0, 2, 0); 
+                controls.update();
 
-        const strapMaterial = new THREE.MeshStandardMaterial({ color: 0x101010 });
-        const strap = new THREE.Mesh(new THREE.BoxGeometry(1.7, 2.2, 1.7), strapMaterial);
-        strap.position.set(0, 9.5, 0);
-        robotModel.add(strap);
-        
-        const wheelGroup = new THREE.Group();
-        const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.5 });
-        const tireMaterial = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
-        
-        function createWheel() {
-            const wheel = new THREE.Group();
-            const tire = new THREE.Mesh(new THREE.CylinderGeometry(4.1, 4.1, 2, 32), tireMaterial);
-            wheel.add(tire);
-            const rim = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, 2.2, 32), wheelMaterial);
-            wheel.add(rim);
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+                scene.add(ambientLight);
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                directionalLight.position.set(10, 20, 15);
+                scene.add(directionalLight);
+                
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(10, 10);
+                const floorMaterial = new THREE.MeshStandardMaterial({ map: texture });
+                const floorGeometry = new THREE.PlaneGeometry(200, 200);
+                floor = new THREE.Mesh(floorGeometry, floorMaterial);
+                floor.rotation.x = -Math.PI / 2;
+                floor.position.y = -2.3; 
+                scene.add(floor);
 
-            const spokeGeometry = new THREE.BoxGeometry(3.5, 0.4, 0.4);
-            for (let i = 0; i < 7; i++) {
-                const spoke = new THREE.Mesh(spokeGeometry, wheelMaterial);
-                spoke.rotation.z = (i / 7) * Math.PI;
-                wheel.add(spoke);
+                robotModel = new THREE.Group();
+                
+                const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x1A1A1A, roughness: 0.6 });
+                const body = new THREE.Mesh(new THREE.BoxGeometry(7, 3, 5), bodyMaterial);
+                body.position.y = 0;
+                robotModel.add(body);
+
+                const mast = new THREE.Mesh(new THREE.BoxGeometry(1.5, 7, 1.5), bodyMaterial);
+                mast.position.y = 5;
+                robotModel.add(mast);
+
+                const batteryMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFF00, roughness: 0.8 });
+                const battery = new THREE.Mesh(new THREE.BoxGeometry(4, 2, 1), batteryMaterial);
+                battery.position.set(0, 9.5, -0.5);
+                robotModel.add(battery);
+
+                const strapMaterial = new THREE.MeshStandardMaterial({ color: 0x101010 });
+                const strap = new THREE.Mesh(new THREE.BoxGeometry(1.7, 2.2, 1.7), strapMaterial);
+                strap.position.set(0, 9.5, 0);
+                robotModel.add(strap);
+                
+                const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0xF0F0F0, roughness: 0.5 });
+                const tireMaterial = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
+                
+                function createWheel() {
+                    const wheel = new THREE.Group();
+                    const tire = new THREE.Mesh(new THREE.CylinderGeometry(4.1, 4.1, 2, 32), tireMaterial);
+                    wheel.add(tire);
+                    const rim = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, 2.2, 32), wheelMaterial);
+                    wheel.add(rim);
+
+                    const spokeGeometry = new THREE.CylinderGeometry(0.3, 0.3, 2.3, 8);
+                    const spokePositions = 3.0;
+                    for (let i = 0; i < 7; i++) {
+                        const angle = (i / 7) * Math.PI * 2;
+                        const spoke = new THREE.Mesh(spokeGeometry, wheelMaterial);
+                        spoke.position.x = Math.cos(angle) * spokePositions * 0.5;
+                        spoke.position.y = Math.sin(angle) * spokePositions * 0.5;
+                        spoke.lookAt(0,0,0);
+                        wheel.add(spoke);
+                    }
+                    return wheel;
+                }
+
+                leftWheel = createWheel();
+                leftWheel.position.x = -6.5; 
+                robotModel.add(leftWheel);
+
+                rightWheel = createWheel();
+                rightWheel.position.x = 6.5; 
+                robotModel.add(rightWheel);
+                
+                [leftWheel, rightWheel].forEach(w => w.rotation.z = Math.PI / 2);
+
+                scene.add(robotModel);
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    controls.update();
+                    renderer.render(scene, camera);
+                }
+                animate();
+
+                window.addEventListener('resize', () => {
+                    if (!container || !renderer) return;
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                }, false);
+            },
+            undefined, // onProgress callback (niepotrzebny)
+            function (err) {
+                console.error('Blad ladowania tekstury podlogi.');
+                addLogMessage('Blad ladowania tekstury 3D!', 'error');
             }
-            return wheel;
-        }
-
-        leftWheel = createWheel();
-        leftWheel.position.x = -6.5; 
-        robotModel.add(leftWheel);
-
-        rightWheel = createWheel();
-        rightWheel.position.x = 6.5; 
-        robotModel.add(rightWheel);
-        
-        [leftWheel, rightWheel].forEach(w => w.rotation.z = Math.PI / 2);
-
-        scene.add(robotModel);
-
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            if (!container || !renderer) return;
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        }, false);
+        );
     }
     
     window.onload = () => { 
@@ -1138,10 +1152,14 @@
         document.getElementById('saveProfileBtn').addEventListener('click', saveProfile); 
         document.getElementById('applyProfileBtn').addEventListener('click', sendProfileToRobot); 
         document.getElementById('profileSelect').addEventListener('change', applyProfileToPanel); 
-        document.querySelectorAll('.accordion-header').forEach(header => { 
+        
+        document.querySelectorAll('.accordion-header').forEach(header => {
             if (!header.classList.contains('active')) {
                 const content = header.nextElementSibling;
-                content.classList.remove('active');
+                if(content) content.style.maxHeight = null;
+            } else {
+                 const content = header.nextElementSibling;
+                 if(content) content.style.maxHeight = content.scrollHeight + "px";
             }
         });
     };
