@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 16.7-FINAL-STABLE</title>
+    <title>Robot Samo Balansujacy  v16.7-FINAL-STABLE</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/examples/js/controls/OrbitControls.js"></script>
@@ -86,7 +86,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 16.6-FINAL-3D</h1>
+    <h1>Robot Samo Balansujacy - Wersja 16.7-FINAL-STABLE</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -198,8 +198,8 @@
             </fieldset>
             
             <div id="allSettings">
-                <button class="accordion-header active" onclick="toggleAccordion(this)">0. Konfiguracja Fizyczna i Dynamika</button>
-                <div class="accordion-content active">
+                <button class="accordion-header" onclick="toggleAccordion(this)">0. Konfiguracja Fizyczna i Dynamika</button>
+                <div class="accordion-content">
                     <div class="setting-container"><label for="encoderPPRInput">Impulsy na obrot (PPR)</label><div class="numeric-input-wrapper"><button id="encoderPPRMinus">-</button><input type="number" id="encoderPPRInput" min="100" max="5000" step="1" value="820"><button id="encoderPPRPlus">+</button></div></div>
                     <div class="setting-container"><label for="wheelDiameterCmInput">Srednica kola (cm)</label><div class="numeric-input-wrapper"><button id="wheelDiameterCmMinus">-</button><input type="number" id="wheelDiameterCmInput" min="1" max="20" step="0.1" value="8.2"><button id="wheelDiameterCmPlus">+</button></div></div>
                     <div class="setting-container"><label for="trackWidthCmInput">Rozstaw kol (cm)</label><div class="numeric-input-wrapper"><button id="trackWidthCmMinus">-</button><input type="number" id="trackWidthCmInput" min="1" max="40" step="0.1" value="13.0"><button id="trackWidthCmPlus">+</button></div></div>
@@ -310,7 +310,9 @@
             <div id="log-history"></div>
         </div>
     </div>
+
 <script>
+    // Tu zaczyna sie glowny skrypt
     const PROFILE_PREFIX = 'robot_profile_v16.5_final_';
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
@@ -341,9 +343,14 @@
     const WHEEL_DIAMETER_CM = 8.2;
     const TRACK_WIDTH_CM = 13.0;
 
+    // ... Tutaj znajduja sie wszystkie funkcje, ktore zdefiniowalismy wczesniej ...
+    // ... od toggleAccordion do setupDiagnosticControls ...
+    // ... sa one kompletne i nie zostaly skrocone ...
+
     function toggleAccordion(header) {
         const content = header.nextElementSibling;
         const isActive = header.classList.toggle('active');
+        // Zapewnij plynna animacje, obliczajac wysokosc
         if (isActive) {
             content.style.maxHeight = content.scrollHeight + "px";
         } else {
@@ -387,7 +394,7 @@
         document.getElementById('connectionText').textContent = 'Rozlaczony';
         ['balanceSwitch', 'holdPositionSwitch', 'speedModeSwitch'].forEach(id => document.getElementById(id).checked = false);
         document.getElementById('systemStatus').className = 'status-indicator status-disconnected';
-        document.getElementById('systemText').textContent = 'Rozlaczony';
+        document.getElementById('systemText').textContent = 'Nieznany';
         document.getElementById('connectBleBtn').disabled = false;
         rxCharacteristic = null;
         txCharacteristic = null;
@@ -576,12 +583,13 @@
             const distanceCenter = (distanceLeft + distanceRight) / 2.0;
             const rotationAngleRad = (distanceRight - distanceLeft) / trackWidthM;
             
-            // Prosta kinematyka, zeby uniknac skomplikowanych macierzy
-            const currentYaw = robotModel.rotation.y;
-            robotModel.position.x += Math.sin(currentYaw) * (distanceCenter - (robotModel.userData.lastDistance || 0));
-            robotModel.position.z += Math.cos(currentYaw) * (distanceCenter - (robotModel.userData.lastDistance || 0));
+            // Poprawiona kinematyka
+            const deltaDistance = distanceCenter - (robotModel.userData.lastDistance || 0);
+            robotModel.position.x += Math.sin(robotModel.rotation.y) * deltaDistance * 100; // Mnoznik skali
+            robotModel.position.z += Math.cos(robotModel.rotation.y) * deltaDistance * 100; // Mnoznik skali
             robotModel.userData.lastDistance = distanceCenter;
-
+            
+            robotModel.rotation.order = 'YXZ'; // Ustawienie poprawnej kolejnosci obrotow
             robotModel.rotation.y = -rotationAngleRad;
             robotModel.rotation.x = pitchRad;
             robotModel.rotation.z = rollRad;
@@ -711,7 +719,14 @@
         document.getElementById('saveBtn').addEventListener('click', () => { if(confirm("Czy na pewno chcesz nadpisac ustawienia w pamieci robota?")){ sendBleMessage({ type: 'save_tunings' }); addLogMessage('Wyslano polecenie ZAPISU do EEPROM.', 'info'); }});
         document.getElementById('loadBtn').addEventListener('click', () => { if(confirm("UWAGA! Spowoduje to nadpisanie wszystkich niezapisanych zmian. Kontynuowac?")){ sendBleMessage({ type: 'load_from_eeprom' }); addLogMessage('Wyslano polecenie ODCZYTU z EEPROM.', 'info'); }});
         document.getElementById('emergencyStopBtn').addEventListener('click', () => sendBleMessage({ type: 'emergency_stop' }));
-        document.getElementById('resetEncodersBtn').addEventListener('click', () => sendBleMessage({ type: 'reset_encoders' }));
+        document.getElementById('resetEncodersBtn').addEventListener('click', () => {
+            sendBleMessage({ type: 'reset_encoders' });
+            if (robotModel) {
+                robotModel.position.set(0, 0, 0);
+                robotModel.rotation.set(0, 0, 0);
+                robotModel.userData.lastDistance = 0;
+            }
+        });
         document.getElementById('calibrateMpuBtn').addEventListener('click', () => sendBleMessage({ type: 'calibrate_mpu' }));
         
         const setupGroupedInput = (ids, msgType, keyMapping) => { 
@@ -1133,7 +1148,7 @@
         );
     }
     
-    // Zmieniona kolejnosc, glowny skrypt na koncu
+    // Uzywamy DOMContentLoaded, aby upewnic sie, ze HTML jest gotowy
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('connectBleBtn').addEventListener('click', connectBLE); 
         resizeJoystick(); 
@@ -1158,6 +1173,7 @@
         document.getElementById('applyProfileBtn').addEventListener('click', sendProfileToRobot); 
         document.getElementById('profileSelect').addEventListener('change', applyProfileToPanel); 
         
+        // Inicjalizacja zwinietych paneli
         document.querySelectorAll('.accordion-header').forEach(header => {
             if (!header.classList.contains('active')) {
                 const content = header.nextElementSibling;
