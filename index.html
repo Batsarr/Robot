@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 16.2-FINAL-GESTURE-FIX</title>
+    <title>Robot Samo Balansujacy - Wersja 16.2-FINAL</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -79,13 +79,12 @@
         .accordion-content.active { max-height: 2000px; transition: max-height 0.4s ease-in; padding: 15px; }
         .pwm-info { background-color: #20232a; padding: 10px; border-radius: 5px; margin-bottom: 15px; border-left: 4px solid #61dafb; }
         .pwm-info strong { color: #a2f279; }
-        .gesture-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 16.2-FINAL-GESTURE-FIX</h1>
+    <h1>Robot Samo Balansujacy - Wersja 16.2-FINAL</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -94,13 +93,6 @@
             <div class="control-row"><span class="control-label">Trzymaj Pozycje</span><label class="switch"><input type="checkbox" id="holdPositionSwitch"><span class="slider round"></span></label></div>
             <div class="control-row"><span class="control-label">Tryb Predkosci</span><label class="switch"><input type="checkbox" id="speedModeSwitch"><span class="slider round"></span></label></div>
             
-            <fieldset style="margin-top: 15px;"><legend>Sterowanie Telefonem</legend>
-                <div class="control-row"><span class="control-label">Sterowanie Gestami</span><label class="switch"><input type="checkbox" id="gestureControlSwitch"><span class="slider round"></span></label></div>
-                <div class="gesture-controls">
-                    <button id="calibrateGestureBtn" disabled>Aktywuj i Kalibruj</button>
-                </div>
-            </fieldset>
-
             <fieldset style="padding: 10px 10px 5px 10px;"><legend>Strojenie Joysticka</legend>
                 <div class="setting-block"><div class="setting-container"><label for="expoJoystickInput">Expo Joysticka (%)</label><div class="numeric-input-wrapper"><button id="expoJoystickMinus">-</button><input type="number" id="expoJoystickInput" min="0" max="90" step="1" value="0"><button id="expoJoystickPlus">+</button></div></div></div>
                 <div class="setting-block"><div class="setting-container"><label for="maxSpeedJoystickInput">Max. predkosc (imp/s)</label><div class="numeric-input-wrapper"><button id="maxSpeedJoystickMinus">-</button><input type="number" id="maxSpeedJoystickInput" min="200" max="4000" step="100" value="800"><button id="maxSpeedJoystickPlus">+</button></div></div></div>
@@ -194,8 +186,7 @@
                     <div class="setting-container"><label for="trackWidthCmInput">Rozstaw kol (cm)</label><div class="numeric-input-wrapper"><button id="trackWidthCmMinus">-</button><input type="number" id="trackWidthCmInput" min="1" max="40" step="0.1" value="13.0"><button id="trackWidthCmPlus">+</button></div></div>
                     <div class="setting-container"><label for="motorBacklashInput">Luz silnika (impulsy)</label><div class="numeric-input-wrapper"><button id="motorBacklashMinus">-</button><input type="number" id="motorBacklashInput" min="0" max="200" step="1" value="0"><button id="motorBacklashPlus">+</button></div></div>
                     <hr style="border-color: #4a4f58; margin: 10px 0;">
-                    <div class="setting-container"><label for="turnToRollTargetInput">Docelowy Kat Pochylenia (st.)</label><div class="numeric-input-wrapper"><button id="turnToRollTargetMinus">-</button><input type="number" id="turnToRollTargetInput" min="0" max="15" step="0.5" value="0"><button id="turnToRollTargetPlus">+</button></div></div>
-                    <div class="setting-container"><label for="rollCorrectionKpInput">Kp Korekcji Pochylenia</label><div class="numeric-input-wrapper"><button id="rollCorrectionKpMinus">-</button><input type="number" id="rollCorrectionKpInput" min="0" max="50" step="0.5" value="0"><button id="rollCorrectionKpPlus">+</button></div></div>
+                    <div class="setting-container"><label for="turnToRollTargetInput">Docelowy Kat Pochylenia (st.)</label><div class="numeric-input-wrapper"><button id="turnToRollTargetMinus">-</button><input type="number" id="turnToRollTargetInput" min="0" max="15" step="0.5" value="5.0"><button id="turnToRollTargetPlus">+</button></div></div>
                     <hr style="border-color: #4a4f58; margin: 10px 0;">
                     <div class="setting-container"><label for="balanceDeadbandAngleInput">Martwa Strefa Balansu (st.)</label><div class="numeric-input-wrapper"><button id="balanceDeadbandAngleMinus">-</button><input type="number" id="balanceDeadbandAngleInput" min="0" max="5" step="0.1" value="0.5"><button id="balanceDeadbandAnglePlus">+</button></div></div>
                 </div>
@@ -275,7 +266,18 @@
                     <div class="setting-block"><div class="setting-container"><label for="kdHeadingInput">Kd Kierunku</label><div class="numeric-input-wrapper"><button id="kdHeadingMinus">-</button><input type="number" id="kdHeadingInput" min="0" max="5.0" step="0.05" value="0.1"><button id="kdHeadingPlus">+</button></div></div></div>
                 </div>
 
-                <button class="accordion-header" onclick="toggleAccordion(this)">8. Ustawienia Dodatkowe</button>
+                <!-- NOWA SEKCJA -->
+                <button class="accordion-header" onclick="toggleAccordion(this)">8. Strojenie PID (Przechyl w Skrecie)</button>
+                <div class="accordion-content">
+                    <div class="pwm-info">
+                         <strong>INFO:</strong> Ten regulator stabilizuje robota na boki podczas skrecania.
+                     </div>
+                    <div class="setting-block"><div class="setting-container"><label for="kpRollInput">Kp Przechylu</label><div class="numeric-input-wrapper"><button id="kpRollMinus">-</button><input type="number" id="kpRollInput" min="0" max="50.0" step="0.5" value="15.0"><button id="kpRollPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kiRollInput">Ki Przechylu</label><div class="numeric-input-wrapper"><button id="kiRollMinus">-</button><input type="number" id="kiRollInput" min="0" max="10.0" step="0.1" value="0.0"><button id="kiRollPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="kdRollInput">Kd Przechylu</label><div class="numeric-input-wrapper"><button id="kdRollMinus">-</button><input type="number" id="kdRollInput" min="0" max="5.0" step="0.05" value="0.5"><button id="kdRollPlus">+</button></div></div></div>
+                </div>
+
+                <button class="accordion-header" onclick="toggleAccordion(this)">9. Ustawienia Dodatkowe</button>
                 <div class="accordion-content">
                     <div class="setting-block"><div class="setting-container"><label for="joystickDeadzoneInput">Martwa Strefa (%)</label><div class="numeric-input-wrapper"><button id="joystickDeadzoneMinus">-</button><input type="number" id="joystickDeadzoneInput" min="0" max="50" step="1" value="0"><button id="joystickDeadzonePlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="turnFactorInput">Moc Skretu (%)</label><div class="numeric-input-wrapper"><button id="turnFactorMinus">-</button><input type="number" id="turnFactorInput" min="0" max="100" step="1" value="25"><button id="turnFactorPlus">+</button></div></div></div>
@@ -292,7 +294,7 @@
         </div>
     </div>
 <script>
-    const PROFILE_PREFIX = 'robot_profile_v16.0_features_';
+    const PROFILE_PREFIX = 'robot_profile_v16.2_final_';
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
         'roll': { label: 'Roll (Kat)', color: '#fd79a8' },
@@ -312,11 +314,6 @@
     const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
     const RX_UUID      = "beb5483e-36e1-4688-b7f5-ea07361b26a9";
     const TX_UUID      = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-    
-    let gestureControlState = 'inactive'; // 'inactive', 'calibrating', 'active'
-    let gestureOffset = { beta: 0, gamma: 0 };
-    let motionDataReceived = false;
-    let motionCheckTimeout;
 
     const joystickCanvas = document.getElementById('joystickCanvas'); 
     const joystickCtx = joystickCanvas.getContext('2d');
@@ -363,11 +360,7 @@
         console.log('Rozlaczono z robotem.');
         document.getElementById('connectionStatus').className = 'status-indicator status-disconnected';
         document.getElementById('connectionText').textContent = 'Rozlaczony';
-        ['balanceSwitch', 'holdPositionSwitch', 'speedModeSwitch', 'gestureControlSwitch'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.checked = false;
-            if (id === 'gestureControlSwitch') el.dispatchEvent(new Event('change'));
-        });
+        ['balanceSwitch', 'holdPositionSwitch', 'speedModeSwitch'].forEach(id => document.getElementById(id).checked = false);
         document.getElementById('systemStatus').className = 'status-indicator status-disconnected';
         document.getElementById('systemText').textContent = 'Rozlaczony';
         document.getElementById('connectBleBtn').disabled = false;
@@ -466,6 +459,9 @@
             kpHeading: data.kp_h, 
             kiHeading: data.ki_h, 
             kdHeading: data.kd_h, 
+            kpRoll: data.kp_roll,
+            kiRoll: data.ki_roll,
+            kdRoll: data.kd_roll,
             joystickAngleSensitivity: data.joystick_angle_sensitivity, 
             motorBacklash: data.motor_backlash, 
             encoderPPR: data.encoder_ppr, 
@@ -477,7 +473,6 @@
             speedPidDeadband: data.speed_pid_deadband, 
             positionPidDeadband: data.position_pid_deadband,
             turnToRollTarget: data.turn_to_roll_target,
-            rollCorrectionKp: data.roll_correction_kp,
             balanceDeadbandAngle: data.balance_deadband_angle
         };
         
@@ -716,9 +711,10 @@
         setupGroupedInput(['kpPosition', 'kiPosition', 'kdPosition', 'maxTargetSpeedFromPosPID', 'positionPidDeadband'], 'position_pid_update', { 'kpPosition': 'kp_p', 'kiPosition': 'ki_p', 'kdPosition': 'kd_p', 'maxTargetSpeedFromPosPID': 'max_target_speed', 'positionPidDeadband': 'deadband_p' });
         setupGroupedInput(['kpRotation', 'kdRotation'], 'rotation_pid_update', { 'kpRotation': 'kp_r', 'kdRotation': 'kd_r' });
         setupGroupedInput(['kpHeading', 'kiHeading', 'kdHeading'], 'heading_pid_update', { 'kpHeading': 'kp_h', 'kiHeading': 'ki_h', 'kdHeading': 'kd_h' });
-        setupGroupedInput(['encoderPPR', 'wheelDiameterCm', 'trackWidthCm', 'motorBacklash', 'turnToRollTarget', 'rollCorrectionKp', 'balanceDeadbandAngle'], 'calibration_update', { 
+        setupGroupedInput(['kpRoll', 'kiRoll', 'kdRoll'], 'roll_pid_update', { 'kpRoll': 'kp_roll', 'kiRoll': 'ki_roll', 'kdRoll': 'kd_roll' });
+        setupGroupedInput(['encoderPPR', 'wheelDiameterCm', 'trackWidthCm', 'motorBacklash', 'turnToRollTarget', 'balanceDeadbandAngle'], 'calibration_update', { 
             'encoderPPR': 'ppr', 'wheelDiameterCm': 'wheel_diameter', 'trackWidthCm': 'track_width', 'motorBacklash': 'backlash', 
-            'turnToRollTarget': 'turn_to_roll_target', 'rollCorrectionKp': 'roll_correction_kp', 'balanceDeadbandAngle': 'balance_deadband_angle'
+            'turnToRollTarget': 'turn_to_roll_target', 'balanceDeadbandAngle': 'balance_deadband_angle'
         });
         
         setupManualTuningControls();
@@ -856,7 +852,6 @@
     }
     
     function sendJoystickData() { 
-        if(gestureControlState === 'active') return;
         sendBleMessage({ type: 'joystick', x: currentX / joystickRadius, y: -currentY / joystickRadius }); 
     }
     
@@ -881,10 +876,6 @@
     document.addEventListener('touchend', endDrag);
     
     function pollGamepad() { 
-        if (gestureControlState === 'active') {
-            requestAnimationFrame(pollGamepad);
-            return;
-        }
         const gamepads = navigator.getGamepads(); 
         if (!gamepads[gamepadIndex]) return; 
         const gp = gamepads[gamepadIndex]; 
@@ -954,76 +945,6 @@
         }); 
     }
     
-    function motionHandler(event) {
-        motionDataReceived = true;
-        
-        if (gestureControlState === 'calibrating') {
-            gestureOffset.beta = event.beta;
-            gestureOffset.gamma = event.gamma;
-            gestureControlState = 'active';
-            addLogMessage(`Pozycja telefonu skalibrowana: Pitch=${gestureOffset.beta.toFixed(1)}, Roll=${gestureOffset.gamma.toFixed(1)}`, 'info');
-            addLogMessage("Sterowanie gestami AKTYWOWANE.", "warn");
-            document.getElementById('calibrateGestureBtn').textContent = "Kalibruj Ponownie";
-        }
-        
-        if (gestureControlState === 'active') {
-            let pitch = event.beta;
-            let roll = event.gamma;
-            let relativePitch = pitch - gestureOffset.beta;
-            let relativeRoll = roll - gestureOffset.gamma;
-            let joyY = -Math.max(-1, Math.min(1, relativePitch / 45.0));
-            let joyX = Math.max(-1, Math.min(1, relativeRoll / 45.0));
-            sendBleMessage({ type: 'joystick', x: joyX, y: joyY });
-        }
-    }
-
-    function setupGestureControls() {
-        const gestureSwitch = document.getElementById('gestureControlSwitch');
-        const calibrateBtn = document.getElementById('calibrateGestureBtn');
-
-        if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
-            addLogMessage("Sterowanie gestami wymaga polaczenia HTTPS.", "error");
-            gestureSwitch.parentElement.parentElement.style.opacity = "0.5";
-            gestureSwitch.disabled = true;
-            calibrateBtn.disabled = true;
-            return;
-        }
-
-        gestureSwitch.addEventListener('change', (e) => {
-            const isEnabled = e.target.checked;
-            calibrateBtn.disabled = !isEnabled;
-            
-            if (!isEnabled) {
-                window.removeEventListener('devicemotion', motionHandler);
-                clearTimeout(motionCheckTimeout);
-                gestureControlState = 'inactive';
-                addLogMessage("Sterowanie gestami wylaczone.", "info");
-                sendBleMessage({ type: 'joystick', x: 0, y: 0 });
-                calibrateBtn.textContent = "Aktywuj i Kalibruj";
-            } else {
-                 addLogMessage("Gotowy do aktywacji gestow. Kliknij przycisk kalibracji.", "info");
-            }
-        });
-
-        calibrateBtn.addEventListener('click', () => {
-            addLogMessage("Proba aktywacji czujnikow ruchu...", "info");
-            gestureControlState = 'calibrating';
-            motionDataReceived = false;
-            window.addEventListener('devicemotion', motionHandler);
-
-            clearTimeout(motionCheckTimeout);
-            motionCheckTimeout = setTimeout(() => {
-                if (!motionDataReceived) {
-                    window.removeEventListener('devicemotion', motionHandler);
-                    gestureControlState = 'inactive';
-                    addLogMessage("BLAD: Brak sygnalu z czujnikow. INSTRUKCJA DLA ANDROIDA: Wejdz w Ustawienia przegladarki -> Ustawienia witryn -> Czujniki ruchu i upewnij sie, ze dostep dla tej strony jest ZEZWOLONY.", "error");
-                    gestureSwitch.checked = false;
-                    calibrateBtn.disabled = true;
-                }
-            }, 1000); // Czekaj 1 sekunde na dane
-        });
-    }
-    
     function setupStateSync() { 
         document.addEventListener('visibilitychange', () => { 
             if (document.visibilityState === 'visible') { 
@@ -1059,7 +980,6 @@
         setupStateSync(); 
         setupDiagnosticControls(); 
         setupGamepadControls(); 
-        setupGestureControls();
         document.getElementById('saveProfileBtn').addEventListener('click', saveProfile); 
         document.getElementById('applyProfileBtn').addEventListener('click', sendProfileToRobot); 
         document.getElementById('profileSelect').addEventListener('change', applyProfileToPanel); 
