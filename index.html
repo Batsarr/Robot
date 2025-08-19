@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 16.4-FINAL-FIXES</title>
+    <title>Robot Samo Balansujacy - Wersja 16.5-FINAL-REFINED</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -84,7 +84,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 16.4-FINAL-FIXES</h1>
+    <h1>Robot Samo Balansujacy - Wersja 16.5-FINAL-REFINED</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -226,7 +226,7 @@
                 
                 <button class="accordion-header" onclick="toggleAccordion(this)">3. Strojenie PID (Balans)</button>
                 <div class="accordion-content">
-                    <div class="setting-block"><div class="setting-container"><label for="joystickAngleSensitivityInput">Czulosc joysticka (kat)</label><div class="numeric-input-wrapper"><button id="joystickAngleSensitivityMinus">-</button><input type="number" id="joystickAngleSensitivityInput" min="1" max="25" step="1" value="10"><button id="joystickAngleSensitivityPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="joystickAngleSensitivityInput">Maksymalny Kat (Tryb Kata)</label><div class="numeric-input-wrapper"><button id="joystickAngleSensitivityMinus">-</button><input type="number" id="joystickAngleSensitivityInput" min="1" max="25" step="1" value="10"><button id="joystickAngleSensitivityPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kpBalanceInput">Kp (Sztywnosc)</label><div class="numeric-input-wrapper"><button id="kpBalanceMinus">-</button><input type="number" id="kpBalanceInput" min="0" max="200" step="1" value="95"><button id="kpBalancePlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kiBalanceInput">Ki (Korekta bledu)</label><div class="numeric-input-wrapper"><button id="kiBalanceMinus">-</button><input type="number" id="kiBalanceInput" min="0" max="20" step="0.05" value="0"><button id="kiBalancePlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kdBalanceInput">Kd (Tlumienie)</label><div class="numeric-input-wrapper"><button id="kdBalanceMinus">-</button><input type="number" id="kdBalanceInput" min="0" max="20" step="0.01" value="3.23"><button id="kdBalancePlus">+</button></div></div></div>
@@ -237,8 +237,7 @@
                 
                 <button class="accordion-header" onclick="toggleAccordion(this)">4. Strojenie PID (Predkosc)</button>
                 <div class="accordion-content">
-                    <div class="setting-block"><div class="setting-container"><label for="speedToAngleRatioInput">Stosunek predkosc/kat</label><div class="numeric-input-wrapper"><button id="speedToAngleRatioMinus">-</button><input type="number" id="speedToAngleRatioInput" min="0.001" max="1.0" step="0.001" value="0.05"><button id="speedToAngleRatioPlus">+</button></div></div></div>
-                    <div class="setting-block"><div class="setting-container"><label for="maxTargetAngleFromSpeedPIDInput">Max Kat z PID Predkosci (st.)</label><div class="numeric-input-wrapper"><button id="maxTargetAngleFromSpeedPIDMinus">-</button><input type="number" id="maxTargetAngleFromSpeedPIDInput" min="1" max="20" step="1" value="20"><button id="maxTargetAngleFromSpeedPIDPlus">+</button></div></div></div>
+                    <div class="setting-block"><div class="setting-container"><label for="maxTargetAngleFromSpeedPIDInput">Maksymalny Kat (Tryb Predkosci)</label><div class="numeric-input-wrapper"><button id="maxTargetAngleFromSpeedPIDMinus">-</button><input type="number" id="maxTargetAngleFromSpeedPIDInput" min="1" max="25" step="1" value="15"><button id="maxTargetAngleFromSpeedPIDPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kpSpeedInput">Kp Predkosci</label><div class="numeric-input-wrapper"><button id="kpSpeedMinus">-</button><input type="number" id="kpSpeedInput" min="0" max="5.0" step="0.01" value="0.05"><button id="kpSpeedPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kiSpeedInput">Ki Predkosci</label><div class="numeric-input-wrapper"><button id="kiSpeedMinus">-</button><input type="number" id="kiSpeedInput" min="0" max="1.0" step="0.001" value="0"><button id="kiSpeedPlus">+</button></div></div></div>
                     <div class="setting-block"><div class="setting-container"><label for="kdSpeedInput">Kd Predkosci</label><div class="numeric-input-wrapper"><button id="kdSpeedMinus">-</button><input type="number" id="kdSpeedInput" min="0" max="1.0" step="0.001" value="0"><button id="kdSpeedPlus">+</button></div></div></div>
@@ -298,7 +297,7 @@
         </div>
     </div>
 <script>
-    const PROFILE_PREFIX = 'robot_profile_v16.4_final_';
+    const PROFILE_PREFIX = 'robot_profile_v16.5_final_';
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
         'roll': { label: 'Roll (Kat)', color: '#fd79a8' },
@@ -472,7 +471,6 @@
             trackWidthCm: data.track_width_cm, 
             maxTargetAngleFromSpeedPID: data.max_target_angle,
             maxTargetSpeedFromPosPID: data.max_target_speed, 
-            speedToAngleRatio: data.speed_to_angle_ratio, 
             speedPidDeadband: data.speed_pid_deadband, 
             positionPidDeadband: data.position_pid_deadband,
             turnToRollTarget: data.turn_to_roll_target,
@@ -712,7 +710,7 @@
             'balancePidDerivativeFilterAlpha': 'filter_alpha'
         });
 
-        setupGroupedInput(['kpSpeed', 'kiSpeed', 'kdSpeed', 'maxTargetAngleFromSpeedPID', 'speedPidDeadband', 'speedToAngleRatio'], 'speed_pid_update', { 'kpSpeed': 'kp_s', 'kiSpeed': 'ki_s', 'kdSpeed': 'kd_s', 'maxTargetAngleFromSpeedPID': 'max_target_angle', 'speedPidDeadband': 'deadband_s', 'speedToAngleRatio': 'speed_to_angle_ratio' });
+        setupGroupedInput(['kpSpeed', 'kiSpeed', 'kdSpeed', 'maxTargetAngleFromSpeedPID', 'speedPidDeadband'], 'speed_pid_update', { 'kpSpeed': 'kp_s', 'kiSpeed': 'ki_s', 'kdSpeed': 'kd_s', 'maxTargetAngleFromSpeedPID': 'max_target_angle', 'speedPidDeadband': 'deadband_s' });
         setupGroupedInput(['kpPosition', 'kiPosition', 'kdPosition', 'maxTargetSpeedFromPosPID', 'positionPidDeadband'], 'position_pid_update', { 'kpPosition': 'kp_p', 'kiPosition': 'ki_p', 'kdPosition': 'kd_p', 'maxTargetSpeedFromPosPID': 'max_target_speed', 'positionPidDeadband': 'deadband_p' });
         setupGroupedInput(['kpRotation', 'kdRotation'], 'rotation_pid_update', { 'kpRotation': 'kp_r', 'kdRotation': 'kd_r' });
         setupGroupedInput(['kpHeading', 'kiHeading', 'kdHeading'], 'heading_pid_update', { 'kpHeading': 'kp_h', 'kiHeading': 'ki_h', 'kdHeading': 'kd_h' });
