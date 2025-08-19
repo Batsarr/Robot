@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy  v.16.7-FINAL-STABLE</title>
+    <title>Robot Samo Balansujacy - Wersja 16.7.1-SPOKE-FIX</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/examples/js/controls/OrbitControls.js"></script>
@@ -312,7 +312,7 @@
     </div>
 
 <script>
-    // Tu zaczyna sie glowny skrypt
+    // Tu zaczyna sie glowny skrypt, umieszczony na koncu body
     const PROFILE_PREFIX = 'robot_profile_v16.5_final_';
     const availableTelemetry = {
         'pitch': { label: 'Pitch (Kat)', color: '#61dafb' },
@@ -343,14 +343,9 @@
     const WHEEL_DIAMETER_CM = 8.2;
     const TRACK_WIDTH_CM = 13.0;
 
-    // ... Tutaj znajduja sie wszystkie funkcje, ktore zdefiniowalismy wczesniej ...
-    // ... od toggleAccordion do setupDiagnosticControls ...
-    // ... sa one kompletne i nie zostaly skrocone ...
-
     function toggleAccordion(header) {
         const content = header.nextElementSibling;
         const isActive = header.classList.toggle('active');
-        // Zapewnij plynna animacje, obliczajac wysokosc
         if (isActive) {
             content.style.maxHeight = content.scrollHeight + "px";
         } else {
@@ -583,13 +578,13 @@
             const distanceCenter = (distanceLeft + distanceRight) / 2.0;
             const rotationAngleRad = (distanceRight - distanceLeft) / trackWidthM;
             
-            // Poprawiona kinematyka
             const deltaDistance = distanceCenter - (robotModel.userData.lastDistance || 0);
-            robotModel.position.x += Math.sin(robotModel.rotation.y) * deltaDistance * 100; // Mnoznik skali
-            robotModel.position.z += Math.cos(robotModel.rotation.y) * deltaDistance * 100; // Mnoznik skali
+            
+            robotModel.position.x += Math.sin(robotModel.rotation.y) * deltaDistance * 100;
+            robotModel.position.z += Math.cos(robotModel.rotation.y) * deltaDistance * 100;
             robotModel.userData.lastDistance = distanceCenter;
             
-            robotModel.rotation.order = 'YXZ'; // Ustawienie poprawnej kolejnosci obrotow
+            robotModel.rotation.order = 'YXZ';
             robotModel.rotation.y = -rotationAngleRad;
             robotModel.rotation.x = pitchRad;
             robotModel.rotation.z = rollRad;
@@ -1107,7 +1102,7 @@
                     const spokeGeometry = new THREE.BoxGeometry(3.5, 0.4, 0.4);
                     for (let i = 0; i < 7; i++) {
                         const spoke = new THREE.Mesh(spokeGeometry, wheelMaterial);
-                        const angle = (i / 7) * Math.PI;
+                        const angle = (i / 7) * Math.PI * 2;
                         spoke.rotation.z = angle;
                         wheel.add(spoke);
                     }
@@ -1148,7 +1143,6 @@
         );
     }
     
-    // Uzywamy DOMContentLoaded, aby upewnic sie, ze HTML jest gotowy
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('connectBleBtn').addEventListener('click', connectBLE); 
         resizeJoystick(); 
@@ -1173,7 +1167,6 @@
         document.getElementById('applyProfileBtn').addEventListener('click', sendProfileToRobot); 
         document.getElementById('profileSelect').addEventListener('change', applyProfileToPanel); 
         
-        // Inicjalizacja zwinietych paneli
         document.querySelectorAll('.accordion-header').forEach(header => {
             if (!header.classList.contains('active')) {
                 const content = header.nextElementSibling;
