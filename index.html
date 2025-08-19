@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 16.1-FIXES</title>
+    <title>Robot Samo Balansujacy - Wersja 16.2-FINAL-GESTURE-FIX</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -85,7 +85,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 16.1-FIXES</h1>
+    <h1>Robot Samo Balansujacy - Wersja 16.2-FINAL-GESTURE-FIX</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -313,10 +313,10 @@
     const RX_UUID      = "beb5483e-36e1-4688-b7f5-ea07361b26a9";
     const TX_UUID      = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
     
-    let gestureControlActive = false;
-    let gestureOffset = { alpha: 0, beta: 0, gamma: 0 };
-    let permissionGranted = false;
+    let gestureControlState = 'inactive'; // 'inactive', 'calibrating', 'active'
+    let gestureOffset = { beta: 0, gamma: 0 };
     let motionDataReceived = false;
+    let motionCheckTimeout;
 
     const joystickCanvas = document.getElementById('joystickCanvas'); 
     const joystickCtx = joystickCanvas.getContext('2d');
@@ -363,7 +363,11 @@
         console.log('Rozlaczono z robotem.');
         document.getElementById('connectionStatus').className = 'status-indicator status-disconnected';
         document.getElementById('connectionText').textContent = 'Rozlaczony';
-        ['balanceSwitch', 'holdPositionSwitch', 'speedModeSwitch', 'gestureControlSwitch'].forEach(id => document.getElementById(id).checked = false);
+        ['balanceSwitch', 'holdPositionSwitch', 'speedModeSwitch', 'gestureControlSwitch'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.checked = false;
+            if (id === 'gestureControlSwitch') el.dispatchEvent(new Event('change'));
+        });
         document.getElementById('systemStatus').className = 'status-indicator status-disconnected';
         document.getElementById('systemText').textContent = 'Rozlaczony';
         document.getElementById('connectBleBtn').disabled = false;
@@ -852,7 +856,7 @@
     }
     
     function sendJoystickData() { 
-        if(gestureControlActive) return;
+        if(gestureControlState === 'active') return;
         sendBleMessage({ type: 'joystick', x: currentX / joystickRadius, y: -currentY / joystickRadius }); 
     }
     
@@ -877,7 +881,7 @@
     document.addEventListener('touchend', endDrag);
     
     function pollGamepad() { 
-        if (gestureControlActive) {
+        if (gestureControlState === 'active') {
             requestAnimationFrame(pollGamepad);
             return;
         }
@@ -950,20 +954,27 @@
         }); 
     }
     
-    function handleDeviceMotion(event) {
-        motionDataReceived = true; // Zaznacz, ze otrzymalismy dane
-        if (!gestureControlActive) return;
+    function motionHandler(event) {
+        motionDataReceived = true;
         
-        let pitch = event.beta;
-        let roll = event.gamma;
-
-        let relativePitch = pitch - gestureOffset.beta;
-        let relativeRoll = roll - gestureOffset.gamma;
-
-        let joyY = -Math.max(-1, Math.min(1, relativePitch / 45.0));
-        let joyX = Math.max(-1, Math.min(1, relativeRoll / 45.0));
+        if (gestureControlState === 'calibrating') {
+            gestureOffset.beta = event.beta;
+            gestureOffset.gamma = event.gamma;
+            gestureControlState = 'active';
+            addLogMessage(`Pozycja telefonu skalibrowana: Pitch=${gestureOffset.beta.toFixed(1)}, Roll=${gestureOffset.gamma.toFixed(1)}`, 'info');
+            addLogMessage("Sterowanie gestami AKTYWOWANE.", "warn");
+            document.getElementById('calibrateGestureBtn').textContent = "Kalibruj Ponownie";
+        }
         
-        sendBleMessage({ type: 'joystick', x: joyX, y: joyY });
+        if (gestureControlState === 'active') {
+            let pitch = event.beta;
+            let roll = event.gamma;
+            let relativePitch = pitch - gestureOffset.beta;
+            let relativeRoll = roll - gestureOffset.gamma;
+            let joyY = -Math.max(-1, Math.min(1, relativePitch / 45.0));
+            let joyX = Math.max(-1, Math.min(1, relativeRoll / 45.0));
+            sendBleMessage({ type: 'joystick', x: joyX, y: joyY });
+        }
     }
 
     function setupGestureControls() {
@@ -983,8 +994,9 @@
             calibrateBtn.disabled = !isEnabled;
             
             if (!isEnabled) {
-                gestureControlActive = false;
-                window.removeEventListener('devicemotion', handleDeviceMotion);
+                window.removeEventListener('devicemotion', motionHandler);
+                clearTimeout(motionCheckTimeout);
+                gestureControlState = 'inactive';
                 addLogMessage("Sterowanie gestami wylaczone.", "info");
                 sendBleMessage({ type: 'joystick', x: 0, y: 0 });
                 calibrateBtn.textContent = "Aktywuj i Kalibruj";
@@ -993,56 +1005,22 @@
             }
         });
 
-        calibrateBtn.addEventListener('click', async () => {
-            // Sciezka dla iOS (Safari)
-            if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                try {
-                    const permissionState = await DeviceMotionEvent.requestPermission();
-                    if (permissionState === 'granted') {
-                        permissionGranted = true;
-                    } else {
-                        addLogMessage("Odmowiono dostepu do czujnikow ruchu.", "error");
-                        gestureSwitch.checked = false;
-                        calibrateBtn.disabled = true;
-                        return;
-                    }
-                } catch (error) {
-                    addLogMessage("Blad podczas prosby o dostep: " + error, "error");
-                    return;
-                }
-            } else {
-                // Sciezka dla Androida (Chrome, Firefox, etc.)
-                permissionGranted = true; // Zakladamy, ze jest, dopoki nie sprawdzimy
-            }
-
-            // Teraz, gdy mamy (lub zakladamy, ze mamy) pozwolenie
-            addLogMessage("Aktywacja nasluchiwania na czujniki ruchu...", "info");
-            window.addEventListener('devicemotion', handleDeviceMotion);
+        calibrateBtn.addEventListener('click', () => {
+            addLogMessage("Proba aktywacji czujnikow ruchu...", "info");
+            gestureControlState = 'calibrating';
             motionDataReceived = false;
+            window.addEventListener('devicemotion', motionHandler);
 
-            // Uruchom mechanizm weryfikacji dla Androida
-            setTimeout(() => {
+            clearTimeout(motionCheckTimeout);
+            motionCheckTimeout = setTimeout(() => {
                 if (!motionDataReceived) {
-                    window.removeEventListener('devicemotion', handleDeviceMotion);
-                    addLogMessage("BLAD: Nie wykryto danych z czujnikow. Sprawdz ustawienia przegladarki dla tej strony i upewnij sie, ze 'Czujniki ruchu' sa ZEZWOLONE.", "error");
+                    window.removeEventListener('devicemotion', motionHandler);
+                    gestureControlState = 'inactive';
+                    addLogMessage("BLAD: Brak sygnalu z czujnikow. INSTRUKCJA DLA ANDROIDA: Wejdz w Ustawienia przegladarki -> Ustawienia witryn -> Czujniki ruchu i upewnij sie, ze dostep dla tej strony jest ZEZWOLONY.", "error");
                     gestureSwitch.checked = false;
                     calibrateBtn.disabled = true;
                 }
-            }, 500);
-
-            // Wspolna czesc dla obu platform
-            const oneShotHandler = (event) => {
-                if (!gestureControlActive) {
-                    gestureControlActive = true;
-                    addLogMessage("Sterowanie gestami AKTYWOWANE.", "warn");
-                }
-                gestureOffset.beta = event.beta;
-                gestureOffset.gamma = event.gamma;
-                window.removeEventListener('devicemotion', oneShotHandler, true);
-                addLogMessage(`Pozycja telefonu skalibrowana: Pitch=${gestureOffset.beta.toFixed(1)}, Roll=${gestureOffset.gamma.toFixed(1)}`, 'info');
-                calibrateBtn.textContent = "Kalibruj Ponownie";
-            };
-            window.addEventListener('devicemotion', oneShotHandler, true);
+            }, 1000); // Czekaj 1 sekunde na dane
         });
     }
     
