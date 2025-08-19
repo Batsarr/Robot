@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 16.0-FEATURES</title>
+    <title>Robot Samo Balansujacy - Wersja 16.1-FIXES</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -85,7 +85,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 16.0-FEATURES</h1>
+    <h1>Robot Samo Balansujacy - Wersja 16.1-FIXES</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -97,7 +97,7 @@
             <fieldset style="margin-top: 15px;"><legend>Sterowanie Telefonem</legend>
                 <div class="control-row"><span class="control-label">Sterowanie Gestami</span><label class="switch"><input type="checkbox" id="gestureControlSwitch"><span class="slider round"></span></label></div>
                 <div class="gesture-controls">
-                    <button id="calibrateGestureBtn" disabled>Kalibruj Pozycje Telefonu</button>
+                    <button id="calibrateGestureBtn" disabled>Aktywuj i Kalibruj</button>
                 </div>
             </fieldset>
 
@@ -264,7 +264,6 @@
                     <div class="setting-block"><div class="setting-container"><label for="kdRotationInput">Kd Obrotu</label><div class="numeric-input-wrapper"><button id="kdRotationMinus">-</button><input type="number" id="kdRotationInput" min="0" max="10.0" step="0.1" value="1"><button id="kdRotationPlus">+</button></div></div></div>
                 </div>
 
-                <!-- NOWA SEKCJA -->
                 <button class="accordion-header" onclick="toggleAccordion(this)">7. Strojenie PID (Utrzymanie Kierunku)</button>
                 <div class="accordion-content">
                     <div class="pwm-info">
@@ -313,9 +312,15 @@
     const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
     const RX_UUID      = "beb5483e-36e1-4688-b7f5-ea07361b26a9";
     const TX_UUID      = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
+    
     let gestureControlActive = false;
     let gestureOffset = { alpha: 0, beta: 0, gamma: 0 };
+    let permissionGranted = false;
 
+    const joystickCanvas = document.getElementById('joystickCanvas'); 
+    const joystickCtx = joystickCanvas.getContext('2d');
+    let joystickCenter, joystickRadius, knobRadius, isDragging = false, sendInterval; 
+    let currentX = 0, currentY = 0;
 
     function toggleAccordion(header) {
         const content = header.nextElementSibling;
@@ -713,7 +718,6 @@
         
         setupManualTuningControls();
         setupDpadControls();
-        setupGestureControls();
     }
 
     function setupDpadControls() { 
@@ -801,11 +805,6 @@
         }); 
     }
     
-    const joystickCanvas = document.getElementById('joystickCanvas'); 
-    const joystickCtx = joystickCanvas.getContext('2d');
-    let joystickCenter, joystickRadius, knobRadius, isDragging = false, sendInterval; 
-    let currentX = 0, currentY = 0;
-    
     function resizeJoystick() { 
         const wrapper = document.getElementById('joystickWrapper'); 
         joystickCanvas.width = wrapper.offsetWidth; 
@@ -851,7 +850,10 @@
         drawJoystick(currentX, currentY); 
     }
     
-    function sendJoystickData() { sendBleMessage({ type: 'joystick', x: currentX / joystickRadius, y: -currentY / joystickRadius }); }
+    function sendJoystickData() { 
+        if(gestureControlActive) return;
+        sendBleMessage({ type: 'joystick', x: currentX / joystickRadius, y: -currentY / joystickRadius }); 
+    }
     
     joystickCanvas.addEventListener('mousedown', e => { isDragging = true; handleMove(e); if (!sendInterval) sendInterval = setInterval(sendJoystickData, 50); });
     joystickCanvas.addEventListener('touchstart', e => { isDragging = true; handleMove(e); if (!sendInterval) sendInterval = setInterval(sendJoystickData, 50); }, { passive: false });
@@ -875,7 +877,7 @@
     
     function pollGamepad() { 
         if (gestureControlActive) {
-            gamepadPollInterval = requestAnimationFrame(pollGamepad);
+            requestAnimationFrame(pollGamepad);
             return;
         }
         const gamepads = navigator.getGamepads(); 
@@ -902,28 +904,28 @@
             lastGamepadState.buttons[i] = button.pressed;
         });
 
-        gamepadPollInterval = requestAnimationFrame(pollGamepad); 
+        requestAnimationFrame(pollGamepad); 
     }
     
     function handleGamepadButtonPress(index) {
         console.log("Gamepad button pressed: ", index);
         switch(index) {
-            case 0: // Zazwyczaj 'A' lub 'X'
+            case 0:
                 document.getElementById('balanceSwitch').click();
                 break;
-            case 1: // Zazwyczaj 'B' lub 'O'
+            case 1:
                  document.getElementById('emergencyStopBtn').click();
                 break;
-            case 2: // Zazwyczaj 'X' lub '[]'
+            case 2:
                 document.getElementById('holdPositionSwitch').click();
                 break;
-            case 3: // Zazwyczaj 'Y' lub 'Triangle'
+            case 3:
                 document.getElementById('speedModeSwitch').click();
                 break;
-            case 8: // Zazwyczaj 'Select/Back'
+            case 8:
                 document.getElementById('resetEncodersBtn').click();
                 break;
-            case 9: // Zazwyczaj 'Start'
+            case 9:
                 document.getElementById('resetZeroBtn').click();
                 break;
         }
@@ -946,19 +948,17 @@
             cancelAnimationFrame(gamepadPollInterval); 
         }); 
     }
-
+    
     function handleDeviceMotion(event) {
         if (!gestureControlActive) return;
         
-        // Beta to pitch (przod/tyl), Gamma to roll (lewo/prawo)
-        let pitch = event.beta; // -180 to 180
-        let roll = event.gamma; // -90 to 90
+        let pitch = event.beta;
+        let roll = event.gamma;
 
         let relativePitch = pitch - gestureOffset.beta;
         let relativeRoll = roll - gestureOffset.gamma;
 
-        // Mapowanie wartosci na zakres -1 do 1
-        let joyY = -Math.max(-1, Math.min(1, relativePitch / 45.0)); // 45 stopni to pelne wychylenie
+        let joyY = -Math.max(-1, Math.min(1, relativePitch / 45.0));
         let joyX = Math.max(-1, Math.min(1, relativeRoll / 45.0));
         
         sendBleMessage({ type: 'joystick', x: joyX, y: joyY });
@@ -968,38 +968,63 @@
         const gestureSwitch = document.getElementById('gestureControlSwitch');
         const calibrateBtn = document.getElementById('calibrateGestureBtn');
 
-        gestureSwitch.addEventListener('change', async (e) => {
-            gestureControlActive = e.target.checked;
-            calibrateBtn.disabled = !gestureControlActive;
+        if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
+            addLogMessage("Sterowanie gestami wymaga polaczenia HTTPS.", "error");
+            gestureSwitch.parentElement.parentElement.style.opacity = "0.5";
+            gestureSwitch.disabled = true;
+            return;
+        }
 
-            if (gestureControlActive) {
-                if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                    const permissionState = await DeviceMotionEvent.requestPermission();
-                    if (permissionState === 'granted') {
-                        window.addEventListener('devicemotion', handleDeviceMotion);
-                        addLogMessage("Sterowanie gestami wlaczone.", "info");
-                    } else {
-                        addLogMessage("Brak pozwolenia na dostep do czujnikow ruchu.", "error");
-                        gestureSwitch.checked = false;
-                        gestureControlActive = false;
-                    }
-                } else {
-                    window.addEventListener('devicemotion', handleDeviceMotion);
-                    addLogMessage("Sterowanie gestami wlaczone (bez prosby o pozwolenie).", "info");
-                }
-            } else {
+        gestureSwitch.addEventListener('change', (e) => {
+            const isEnabled = e.target.checked;
+            calibrateBtn.disabled = !isEnabled;
+            
+            if (!isEnabled) {
+                gestureControlActive = false;
                 window.removeEventListener('devicemotion', handleDeviceMotion);
                 addLogMessage("Sterowanie gestami wylaczone.", "info");
-                sendBleMessage({ type: 'joystick', x: 0, y: 0 }); // Zatrzymaj robota
+                sendBleMessage({ type: 'joystick', x: 0, y: 0 });
+                calibrateBtn.textContent = "Aktywuj i Kalibruj";
+            } else {
+                 addLogMessage("Gotowy do aktywacji gestow. Kliknij przycisk kalibracji.", "info");
             }
         });
 
-        calibrateBtn.addEventListener('click', () => {
-             const oneShotHandler = (event) => {
+        calibrateBtn.addEventListener('click', async () => {
+            if (!permissionGranted) {
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    try {
+                        const permissionState = await DeviceMotionEvent.requestPermission();
+                        if (permissionState === 'granted') {
+                            permissionGranted = true;
+                            addLogMessage("Przyznano dostep do czujnikow ruchu.", "info");
+                        } else {
+                            addLogMessage("Odmowiono dostepu do czujnikow ruchu.", "error");
+                            gestureSwitch.checked = false;
+                            calibrateBtn.disabled = true;
+                            return;
+                        }
+                    } catch (error) {
+                        addLogMessage("Blad podczas prosby o dostep: " + error, "error");
+                        return;
+                    }
+                } else {
+                    permissionGranted = true;
+                }
+            }
+
+            if (!gestureControlActive) {
+                window.addEventListener('devicemotion', handleDeviceMotion);
+                gestureControlActive = true;
+                addLogMessage("Sterowanie gestami AKTYWOWANE.", "warn");
+            }
+            
+            const oneShotHandler = (event) => {
                 gestureOffset.beta = event.beta;
                 gestureOffset.gamma = event.gamma;
                 window.removeEventListener('devicemotion', oneShotHandler, true);
                 addLogMessage(`Pozycja telefonu skalibrowana: Pitch=${gestureOffset.beta.toFixed(1)}, Roll=${gestureOffset.gamma.toFixed(1)}`, 'info');
+                calibrateBtn.textContent = "Kalibruj Ponownie";
             };
             window.addEventListener('devicemotion', oneShotHandler, true);
         });
@@ -1040,6 +1065,7 @@
         setupStateSync(); 
         setupDiagnosticControls(); 
         setupGamepadControls(); 
+        setupGestureControls();
         document.getElementById('saveProfileBtn').addEventListener('click', saveProfile); 
         document.getElementById('applyProfileBtn').addEventListener('click', sendProfileToRobot); 
         document.getElementById('profileSelect').addEventListener('change', applyProfileToPanel); 
