@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 16.6-FINAL-3D</title>
-    <!-- Zmieniono kolejnosc i dodano 'defer', aby zagwarantowac poprawne ladowanie -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/examples/js/controls/OrbitControls.js" defer></script>
+    <title>Robot Samo Balansujacy - Wersja 16.7-FINAL-STABLE</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/examples/js/controls/OrbitControls.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
         h1 { color: #61dafb; font-size: 1.8em; }
@@ -345,7 +344,11 @@
     function toggleAccordion(header) {
         const content = header.nextElementSibling;
         const isActive = header.classList.toggle('active');
-        content.classList.toggle('active', isActive);
+        if (isActive) {
+            content.style.maxHeight = content.scrollHeight + "px";
+        } else {
+            content.style.maxHeight = null;
+        }
     }
 
     async function connectBLE() {
@@ -573,11 +576,15 @@
             const distanceCenter = (distanceLeft + distanceRight) / 2.0;
             const rotationAngleRad = (distanceRight - distanceLeft) / trackWidthM;
             
-            const newPosX = Math.sin(rotationAngleRad) * distanceCenter;
-            const newPosZ = Math.cos(rotationAngleRad) * distanceCenter;
-            
-            robotModel.position.set(newPosX * 100, 0, -newPosZ * 100); 
-            robotModel.rotation.set(pitchRad, -rotationAngleRad, rollRad, 'YXZ');
+            // Prosta kinematyka, zeby uniknac skomplikowanych macierzy
+            const currentYaw = robotModel.rotation.y;
+            robotModel.position.x += Math.sin(currentYaw) * (distanceCenter - (robotModel.userData.lastDistance || 0));
+            robotModel.position.z += Math.cos(currentYaw) * (distanceCenter - (robotModel.userData.lastDistance || 0));
+            robotModel.userData.lastDistance = distanceCenter;
+
+            robotModel.rotation.y = -rotationAngleRad;
+            robotModel.rotation.x = pitchRad;
+            robotModel.rotation.z = rollRad;
         }
     }
     
@@ -1019,7 +1026,6 @@
         const loader = new THREE.TextureLoader();
         loader.load('https://i.imgur.com/gA3t1d3.jpg', 
             function (texture) {
-                // Ta funkcja zostanie wywolana DOPIERO po zaladowaniu tekstury
                 
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x20232a);
@@ -1052,6 +1058,7 @@
                 scene.add(floor);
 
                 robotModel = new THREE.Group();
+                robotModel.userData.lastDistance = 0;
                 
                 const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x1A1A1A, roughness: 0.6 });
                 const body = new THREE.Mesh(new THREE.BoxGeometry(7, 3, 5), bodyMaterial);
@@ -1082,14 +1089,11 @@
                     const rim = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, 2.2, 32), wheelMaterial);
                     wheel.add(rim);
 
-                    const spokeGeometry = new THREE.CylinderGeometry(0.3, 0.3, 2.3, 8);
-                    const spokePositions = 3.0;
+                    const spokeGeometry = new THREE.BoxGeometry(3.5, 0.4, 0.4);
                     for (let i = 0; i < 7; i++) {
-                        const angle = (i / 7) * Math.PI * 2;
                         const spoke = new THREE.Mesh(spokeGeometry, wheelMaterial);
-                        spoke.position.x = Math.cos(angle) * spokePositions * 0.5;
-                        spoke.position.y = Math.sin(angle) * spokePositions * 0.5;
-                        spoke.lookAt(0,0,0);
+                        const angle = (i / 7) * Math.PI;
+                        spoke.rotation.z = angle;
                         wheel.add(spoke);
                     }
                     return wheel;
@@ -1121,7 +1125,7 @@
                     renderer.setSize(container.clientWidth, container.clientHeight);
                 }, false);
             },
-            undefined, // onProgress callback (niepotrzebny)
+            undefined, 
             function (err) {
                 console.error('Blad ladowania tekstury podlogi.');
                 addLogMessage('Blad ladowania tekstury 3D!', 'error');
@@ -1129,7 +1133,8 @@
         );
     }
     
-    window.onload = () => { 
+    // Zmieniona kolejnosc, glowny skrypt na koncu
+    document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('connectBleBtn').addEventListener('click', connectBLE); 
         resizeJoystick(); 
         setupChartControls(); 
@@ -1162,7 +1167,7 @@
                  if(content) content.style.maxHeight = content.scrollHeight + "px";
             }
         });
-    };
+    });
     
     window.onresize = () => { 
         resizeJoystick(); 
