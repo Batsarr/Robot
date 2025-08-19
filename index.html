@@ -316,6 +316,7 @@
     let gestureControlActive = false;
     let gestureOffset = { alpha: 0, beta: 0, gamma: 0 };
     let permissionGranted = false;
+    let motionDataReceived = false;
 
     const joystickCanvas = document.getElementById('joystickCanvas'); 
     const joystickCtx = joystickCanvas.getContext('2d');
@@ -950,6 +951,7 @@
     }
     
     function handleDeviceMotion(event) {
+        motionDataReceived = true; // Zaznacz, ze otrzymalismy dane
         if (!gestureControlActive) return;
         
         let pitch = event.beta;
@@ -972,6 +974,7 @@
             addLogMessage("Sterowanie gestami wymaga polaczenia HTTPS.", "error");
             gestureSwitch.parentElement.parentElement.style.opacity = "0.5";
             gestureSwitch.disabled = true;
+            calibrateBtn.disabled = true;
             return;
         }
 
@@ -991,35 +994,48 @@
         });
 
         calibrateBtn.addEventListener('click', async () => {
-            if (!permissionGranted) {
-                if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                    try {
-                        const permissionState = await DeviceMotionEvent.requestPermission();
-                        if (permissionState === 'granted') {
-                            permissionGranted = true;
-                            addLogMessage("Przyznano dostep do czujnikow ruchu.", "info");
-                        } else {
-                            addLogMessage("Odmowiono dostepu do czujnikow ruchu.", "error");
-                            gestureSwitch.checked = false;
-                            calibrateBtn.disabled = true;
-                            return;
-                        }
-                    } catch (error) {
-                        addLogMessage("Blad podczas prosby o dostep: " + error, "error");
+            // Sciezka dla iOS (Safari)
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                try {
+                    const permissionState = await DeviceMotionEvent.requestPermission();
+                    if (permissionState === 'granted') {
+                        permissionGranted = true;
+                    } else {
+                        addLogMessage("Odmowiono dostepu do czujnikow ruchu.", "error");
+                        gestureSwitch.checked = false;
+                        calibrateBtn.disabled = true;
                         return;
                     }
-                } else {
-                    permissionGranted = true;
+                } catch (error) {
+                    addLogMessage("Blad podczas prosby o dostep: " + error, "error");
+                    return;
                 }
+            } else {
+                // Sciezka dla Androida (Chrome, Firefox, etc.)
+                permissionGranted = true; // Zakladamy, ze jest, dopoki nie sprawdzimy
             }
 
-            if (!gestureControlActive) {
-                window.addEventListener('devicemotion', handleDeviceMotion);
-                gestureControlActive = true;
-                addLogMessage("Sterowanie gestami AKTYWOWANE.", "warn");
-            }
-            
+            // Teraz, gdy mamy (lub zakladamy, ze mamy) pozwolenie
+            addLogMessage("Aktywacja nasluchiwania na czujniki ruchu...", "info");
+            window.addEventListener('devicemotion', handleDeviceMotion);
+            motionDataReceived = false;
+
+            // Uruchom mechanizm weryfikacji dla Androida
+            setTimeout(() => {
+                if (!motionDataReceived) {
+                    window.removeEventListener('devicemotion', handleDeviceMotion);
+                    addLogMessage("BLAD: Nie wykryto danych z czujnikow. Sprawdz ustawienia przegladarki dla tej strony i upewnij sie, ze 'Czujniki ruchu' sa ZEZWOLONE.", "error");
+                    gestureSwitch.checked = false;
+                    calibrateBtn.disabled = true;
+                }
+            }, 500);
+
+            // Wspolna czesc dla obu platform
             const oneShotHandler = (event) => {
+                if (!gestureControlActive) {
+                    gestureControlActive = true;
+                    addLogMessage("Sterowanie gestami AKTYWOWANE.", "warn");
+                }
                 gestureOffset.beta = event.beta;
                 gestureOffset.gamma = event.gamma;
                 window.removeEventListener('devicemotion', oneShotHandler, true);
