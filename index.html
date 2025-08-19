@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Robot Samo Balansujacy - Wersja 16.2-FINAL</title>
+    <title>Robot Samo Balansujacy - Wersja 16.3-FINAL-FIXES</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 15px; background-color: #282c34; color: #fff; font-size: 14px; }
@@ -84,7 +84,7 @@
 <body>
     <div id="emergency-banner">ZATRZYMANIE AWARYJNE</div>
 
-    <h1>Robot Samo Balansujacy - Wersja 16.2-FINAL</h1>
+    <h1>Robot Samo Balansujacy - Wersja 16.3-FINAL-FIXES</h1>
     <div class="main-grid">
         <div class="card" id="controls-card">
             <h2>Sterowanie</h2>
@@ -266,7 +266,6 @@
                     <div class="setting-block"><div class="setting-container"><label for="kdHeadingInput">Kd Kierunku</label><div class="numeric-input-wrapper"><button id="kdHeadingMinus">-</button><input type="number" id="kdHeadingInput" min="0" max="5.0" step="0.05" value="0.1"><button id="kdHeadingPlus">+</button></div></div></div>
                 </div>
 
-                <!-- NOWA SEKCJA -->
                 <button class="accordion-header" onclick="toggleAccordion(this)">8. Strojenie PID (Przechyl w Skrecie)</button>
                 <div class="accordion-content">
                     <div class="pwm-info">
@@ -317,8 +316,7 @@
 
     const joystickCanvas = document.getElementById('joystickCanvas'); 
     const joystickCtx = joystickCanvas.getContext('2d');
-    let joystickCenter, joystickRadius, knobRadius, isDragging = false, sendInterval; 
-    let currentX = 0, currentY = 0;
+    let joystickCenter, joystickRadius, knobRadius, isDragging = false; 
 
     function toggleAccordion(header) {
         const content = header.nextElementSibling;
@@ -828,7 +826,7 @@
         joystickCtx.fill(); 
     }
     
-    function handleMove(e) { 
+    function handleJoystickMove(e) { 
         if (!isDragging) return; 
         e.preventDefault(); 
         const rect = joystickCanvas.getBoundingClientRect(); 
@@ -840,40 +838,40 @@
         const y = clientY - rect.top - joystickCenter.y; 
         const distance = Math.sqrt(x * x + y * y); 
         
+        let finalX, finalY;
+
         if (distance > joystickRadius) { 
             const angle = Math.atan2(y, x); 
-            currentX = joystickRadius * Math.cos(angle); 
-            currentY = joystickRadius * Math.sin(angle); 
+            finalX = joystickRadius * Math.cos(angle); 
+            finalY = joystickRadius * Math.sin(angle); 
         } else { 
-            currentX = x; 
-            currentY = y; 
+            finalX = x; 
+            finalY = y; 
         } 
-        drawJoystick(currentX, currentY); 
+        drawJoystick(finalX, finalY); 
+        sendBleMessage({ type: 'joystick', x: finalX / joystickRadius, y: -finalY / joystickRadius });
     }
     
-    function sendJoystickData() { 
-        sendBleMessage({ type: 'joystick', x: currentX / joystickRadius, y: -currentY / joystickRadius }); 
+    function startJoystickDrag(e){
+        isDragging = true;
+        handleJoystickMove(e);
     }
+
+    function endJoystickDrag(e){
+        if (!isDragging) return;
+        isDragging = false;
+        drawJoystick(0, 0); 
+        sendBleMessage({ type: 'joystick', x: 0, y: 0 });
+    }
+
+    joystickCanvas.addEventListener('mousedown', startJoystickDrag);
+    joystickCanvas.addEventListener('touchstart', startJoystickDrag, { passive: false });
     
-    joystickCanvas.addEventListener('mousedown', e => { isDragging = true; handleMove(e); if (!sendInterval) sendInterval = setInterval(sendJoystickData, 50); });
-    joystickCanvas.addEventListener('touchstart', e => { isDragging = true; handleMove(e); if (!sendInterval) sendInterval = setInterval(sendJoystickData, 50); }, { passive: false });
-    document.addEventListener('mousemove', e => { if (isDragging) handleMove(e); }); 
-    document.addEventListener('touchmove', e => { if (isDragging) handleMove(e); }, { passive: false });
+    document.addEventListener('mousemove', handleJoystickMove); 
+    document.addEventListener('touchmove', handleJoystickMove, { passive: false });
     
-    const endDrag = () => { 
-        if (isDragging) { 
-            isDragging = false; 
-            clearInterval(sendInterval); 
-            sendInterval = null; 
-            currentX = 0; 
-            currentY = 0; 
-            drawJoystick(0, 0); 
-            sendJoystickData(); 
-        } 
-    };
-    
-    document.addEventListener('mouseup', endDrag); 
-    document.addEventListener('touchend', endDrag);
+    document.addEventListener('mouseup', endJoystickDrag); 
+    document.addEventListener('touchend', endJoystickDrag);
     
     function pollGamepad() { 
         const gamepads = navigator.getGamepads(); 
